@@ -1,29 +1,27 @@
-local function tryPurchase(uid, gems, item, playerid, buytimestamp)
-    -- Așteaptă până când articolul este disponibil pentru cumpărare
+local function attemptPurchase(uid, playerid, buytimestamp)
+    -- Asigură-te că timpul de așteptare a trecut
     while workspace:GetServerTimeNow() < buytimestamp do
         task.wait()
     end
 
-    -- Încercarea de a executa cumpărătura în mod sigur cu pcall
+    -- Încercăm să cumpărăm itemul și prindem orice eroare
     local success, result = pcall(function()
         return rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
     end)
 
     if success then
-        -- Verifică rezultatul cumpărăturii
+        -- Dacă apelul a reușit, verificăm rezultatul achiziției
         if result == true then
-            print("Cumpărătura a fost realizată cu succes.")
+            print("Achiziția a fost efectuată cu succes.")
         else
-            warn("Cumpărătura nu a fost realizată: " .. tostring(result))
+            -- Rezultatul achiziției nu a fost un succes, gestionează conform logicii jocului
+            warn("Achiziția a eșuat cu mesajul: " .. tostring(result))
         end
     else
-        warn("A apărut o eroare în timpul cumpărăturii: " .. tostring(result))
+        -- Apelul a eșuat, gestionează eroarea
+        warn("A apărut o eroare la apelul funcției de cumpărare: " .. tostring(result))
     end
 end
-
--- Restul conexiunii evenimentului și a logicii rămân neschimbate.
--- ...
--- Continuare după funcția isItemAvailable și tryPurchase
 
 Booths_Broadcast.OnClientEvent:Connect(function(username, message)
     if type(message) == "table" then
@@ -39,5 +37,10 @@ Booths_Broadcast.OnClientEvent:Connect(function(username, message)
                 local unitGems = gems / (tonumber(data["_am"]) or 1)
 
                 -- Utilizează funcția isItemAvailable pentru a verifica dacă itemul este disponibil
-                if isItemAvailable(item) and unitGems <= 100000
-
+                if isItemAvailable(item) and unitGems <= 1000000 then -- Exemplu de limită a prețului
+                    attemptPurchase(uid, playerid, buytimestamp)
+                end
+            end
+        end
+    end
+end)
