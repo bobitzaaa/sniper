@@ -1,28 +1,23 @@
-local Booths_Broadcast = game:GetService("ReplicatedStorage").Network:WaitForChild("Booths_Broadcast")
-local rs = game:GetService("ReplicatedStorage")
-local Library = require(rs:WaitForChild("Library")) -- Presupunând că ai acces la acest obiect
-
-local function isItemAvailable(item)
-    -- Verifică dacă itemul există în biblioteca Library
-    return Library.Directory.Pets[item] ~= nil
-end
-
 local function tryPurchase(uid, gems, item, playerid, buytimestamp)
-    if not isItemAvailable(item) then
-        warn("Item '" .. item .. "' not found in Library.")
-        return
-    end
-
+    -- Așteaptă până când articolul este disponibil pentru cumpărare
     while workspace:GetServerTimeNow() < buytimestamp do
         task.wait()
     end
 
+    -- Încercarea de a executa cumpărătura în mod sigur cu pcall
     local success, result = pcall(function()
         return rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
     end)
 
-    if not success then
-        warn("Failed to purchase item: " .. tostring(result))
+    if success then
+        -- Verifică rezultatul cumpărăturii
+        if result == true then
+            print("Cumpărătura a fost realizată cu succes.")
+        else
+            warn("Cumpărătura nu a fost realizată: " .. tostring(result))
+        end
+    else
+        warn("A apărut o eroare în timpul cumpărăturii: " .. tostring(result))
     end
 end
 
