@@ -1,53 +1,34 @@
-local Booths_Broadcast = game:GetService("ReplicatedStorage").Network:WaitForChild("Booths_Broadcast")
-local rs = game:GetService("ReplicatedStorage")
-local Library = require(rs:WaitForChild("Library")) -- Presupunând că ai acces la acest obiect
-local snipeNormalPets = false -- Setează aceasta conform necesităților tale
-
 local function tryPurchase(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
+    -- Așteaptă până când articolul este disponibil pentru cumpărare
     while workspace:GetServerTimeNow() < buytimestamp do
         task.wait()
     end
-    local boughtPet, boughtMessage = rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
-    -- Adaugă aici logica de procesare după cumpărare, dacă este necesar
-end
+    -- Verifică dacă toate valorile sunt valide
+    if typeof(uid) == "string" and
+       typeof(gems) == "number" and
+       typeof(item) == "string" and
+       typeof(playerid) == "number" and
+       typeof(buytimestamp) == "number" and
+       (typeof(version) == "number" or version == nil) and -- Presupunând că 'version' poate fi nil
+       (typeof(shiny) == "boolean" or shiny == nil) and -- Presupunând că 'shiny' poate fi nil
+       typeof(amount) == "number" and
+       typeof(username) == "string" and
+       typeof(class) == "string" and
+       typeof(listTimestamp) == "number" and
+       typeof(snipeNormal) == "boolean" then
 
--- ... (restul codului de mai sus)
+        local success, boughtPet, boughtMessage = pcall(function()
+            -- Încercăm să cumpărăm articolul folosind metoda de pe server
+            return rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
+        end)
 
-Booths_Broadcast.OnClientEvent:Connect(function(username, message)
-    if type(message) == "table" then
-        for _, listing in pairs(message["Listings"] or {}) do
-            if type(listing) == "table" and listing["ItemData"] and listing["ItemData"]["data"] then
-                local data = listing["ItemData"]["data"]
-                local gems = tonumber(listing["DiamondCost"])
-                local uid = listing["UID"]
-                local playerid = message['PlayerID']
-                local buytimestamp = listing["ReadyTimestamp"]
-                local item = data["id"]
-                local version = data["pt"]
-                local shiny = data["sh"]
-                local amount = tonumber(data["_am"]) or 1
-                local class = tostring(listing["ItemData"]["class"])
-                local itemType = Library.Directory.Pets[item]
-                local unitGems = gems / amount
-
-                -- Aici începe condițiile specifice pentru cumpărarea itemelor
-                if (string.find(item, "Huge") and unitGems <= 1000000) or
-                   (string.find(item, "Charm") and unitGems <= 15000) or
-                   (snipeNormalPets and gems == 1) or
-                   (class == "Pet" and itemType and itemType.exclusiveLevel and unitGems <= 30000 and item ~= "Banana" and item ~= "Coin") or
-                   (itemType and itemType.titanic and unitGems <= 10000000) or
-                   (itemType and itemType.huge and unitGems <= 1000000) or
-                   ((item == "Titanic Christmas Present" or string.find(item, "2024 New Year")) and unitGems <= 30000) or
-                   (class == "Charm" and unitGems <= 30000 and not string.find(item, "Coins") and not string.find(item, "Agility") and not string.find(item, "Bonus")) or
-                   (class == "Egg" and unitGems <= 100000) or
-                   ((string.find(item, "Key") and not string.find(item, "Lower")) or string.find(item, "Ticket")) and unitGems <= 2500 or
-                   (class == "Enchant" and unitGems <= 50000 and (item == "Fortune" or string.find(item, "Chest Mimic") or item == "Lucky Block" or item == "Massive Comet" or item == "Super Lightning" or item == "Shiny Hunter")) then
-                    coroutine.wrap(tryPurchase)(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listing["Timestamp"], snipeNormal)
-                end
-                -- Aici se termină condițiile specifice pentru cumpărarea itemelor
-            end
+        if success and boughtPet then
+            -- Articolul a fost cumpărat cu succes
+        else
+            -- Tratează cazul de eroare
+            warn("Eroare la cumpărarea articolului: " .. tostring(boughtMessage))
         end
+    else
+        warn("Date invalide pentru cumpărare.")
     end
-end)
-
--- Aici se termină scriptul.
+end
