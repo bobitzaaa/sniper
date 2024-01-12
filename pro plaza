@@ -1,46 +1,21 @@
 local Players = game:GetService('Players')
 local ts = game:GetService("TeleportService")
-local http = game:GetService("HttpService")
-
 local placeId = 15502339080  -- ID-ul jocului Plaza
 
-local function jumpToServer()
-    local servers = {}
-    local sfUrl = "https://games.roblox.com/v1/games/" .. tostring(placeId) .. "/servers/Public?sortOrder=Desc&limit=100"
-    
-    -- Obținem lista de servere disponibile pentru jocul cu ID-ul specificat
-    local success, result = pcall(function()
-        return http:GetAsync(sfUrl)
-    end)
-    
-    -- Verificăm dacă cererea a fost cu succes și decodăm răspunsul JSON
-    if success then
-        local body = http:JSONDecode(result)
-        for _, server in ipairs(body.data) do
-            if server.playing < server.maxPlayers and server.id ~= game.JobId then
-                table.insert(servers, server.id)
-            end
-        end
-    else
-        warn("Nu s-a putut obține lista de servere: " .. tostring(result))
-        return
-    end
-    
-    -- Dacă avem servere disponibile, alegem unul la întâmplare pentru teleportare
-    if #servers > 0 then
-        local randomServerId = servers[math.random(1, #servers)]
-        ts:TeleportToPlaceInstance(placeId, randomServerId, Players.LocalPlayer)
+-- Funcția care verifică numărul de jucători și inițiază teleportarea
+local function checkAndJump()
+    local numPlayers = #Players:GetPlayers()
+    if numPlayers < 20 then
+        ts:Teleport(placeId, Players.LocalPlayer)
     end
 end
 
--- Adăugăm un eveniment care să verifice numărul de jucători când unul părăsește jocul
+-- Verificăm numărul de jucători când unul părăsește jocul
 Players.PlayerRemoving:Connect(function()
-    if #Players:GetPlayers() < 20 then
-        jumpToServer()
-    end
+    checkAndJump()
 end)
 
--- Verificăm și la începutul scriptului numărul de jucători
-if #Players:GetPlayers() < 20 then
-    jumpToServer()
+-- Verificăm numărul de jucători periodic
+while wait(60) do  -- Așteptăm 60 de secunde între verificări
+    checkAndJump()
 end
