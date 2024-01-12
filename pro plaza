@@ -2,20 +2,16 @@ local Players = game:GetService('Players')
 local ts = game:GetService("TeleportService")
 local placeId = 15502339080  -- ID-ul jocului Plaza
 
--- Funcția care verifică numărul de jucători și inițiază teleportarea
+-- Funcția de verificare a numărului de jucători și inițierea teleportării
 local function checkAndJump()
     local numPlayers = #Players:GetPlayers()
     if numPlayers < 20 then
-        ts:Teleport(placeId, Players.LocalPlayer)
+        ts:Teleport(placeId, Players.LocalPlayer)  -- Teleportează jucătorul la același joc (Plaza)
     end
 end
 
--- Verificăm numărul de jucători când unul părăsește jocul
-Players.PlayerRemoving:Connect(function()
-    checkAndJump()
-end)
+-- Setăm evenimentul pentru a verifica numărul de jucători atunci când unul părăsește jocul
+Players.PlayerRemoving:Connect(checkAndJump)
 
--- Verificăm numărul de jucători periodic
-while wait(60) do  -- Așteptăm 60 de secunde între verificări
-    checkAndJump()
-end
+-- Verificăm numărul de jucători imediat când scriptul este rulat
+checkAndJump()
