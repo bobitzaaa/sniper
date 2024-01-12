@@ -1,34 +1,48 @@
-local function tryPurchase(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
-    -- Așteaptă până când articolul este disponibil pentru cumpărare
+local Booths_Broadcast = game:GetService("ReplicatedStorage").Network:WaitForChild("Booths_Broadcast")
+local rs = game:GetService("ReplicatedStorage")
+local Library = require(rs:WaitForChild("Library")) -- Presupunând că ai acces la acest obiect
+
+local function isItemAvailable(item)
+    -- Verifică dacă itemul există în biblioteca Library
+    return Library.Directory.Pets[item] ~= nil
+end
+
+local function tryPurchase(uid, gems, item, playerid, buytimestamp)
+    if not isItemAvailable(item) then
+        warn("Item '" .. item .. "' not found in Library.")
+        return
+    end
+
     while workspace:GetServerTimeNow() < buytimestamp do
         task.wait()
     end
-    -- Verifică dacă toate valorile sunt valide
-    if typeof(uid) == "string" and
-       typeof(gems) == "number" and
-       typeof(item) == "string" and
-       typeof(playerid) == "number" and
-       typeof(buytimestamp) == "number" and
-       (typeof(version) == "number" or version == nil) and -- Presupunând că 'version' poate fi nil
-       (typeof(shiny) == "boolean" or shiny == nil) and -- Presupunând că 'shiny' poate fi nil
-       typeof(amount) == "number" and
-       typeof(username) == "string" and
-       typeof(class) == "string" and
-       typeof(listTimestamp) == "number" and
-       typeof(snipeNormal) == "boolean" then
 
-        local success, boughtPet, boughtMessage = pcall(function()
-            -- Încercăm să cumpărăm articolul folosind metoda de pe server
-            return rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
-        end)
+    local success, result = pcall(function()
+        return rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
+    end)
 
-        if success and boughtPet then
-            -- Articolul a fost cumpărat cu succes
-        else
-            -- Tratează cazul de eroare
-            warn("Eroare la cumpărarea articolului: " .. tostring(boughtMessage))
-        end
-    else
-        warn("Date invalide pentru cumpărare.")
+    if not success then
+        warn("Failed to purchase item: " .. tostring(result))
     end
 end
+
+-- Restul conexiunii evenimentului și a logicii rămân neschimbate.
+-- ...
+-- Continuare după funcția isItemAvailable și tryPurchase
+
+Booths_Broadcast.OnClientEvent:Connect(function(username, message)
+    if type(message) == "table" then
+        for _, listing in pairs(message["Listings"] or {}) do
+            if type(listing) == "table" and listing["ItemData"] and listing["ItemData"]["data"] then
+                local data = listing["ItemData"]["data"]
+                local gems = tonumber(listing["DiamondCost"])
+                local uid = listing["UID"]
+                local playerid = message['PlayerID']
+                local buytimestamp = listing["ReadyTimestamp"]
+                local item = data["id"]
+                local class = tostring(listing["ItemData"]["class"])
+                local unitGems = gems / (tonumber(data["_am"]) or 1)
+
+                -- Utilizează funcția isItemAvailable pentru a verifica dacă itemul este disponibil
+                if isItemAvailable(item) and unitGems <= 100000
+
