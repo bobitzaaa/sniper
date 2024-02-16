@@ -1,19 +1,34 @@
-getgenv().config = {
-    autoFishing = true, -- true / false 
-    placetoFish = "AdvancedFishing", -- "Fishing" // "AdvancedFishing"
-    invisWater = true, -- make area's water transparent
-    
-    userToMail = "bobofarm106", -- your main's username to mail all Magic Shards to
-    amountToMail = 0, -- amount to mail if set to 0 then it sends all
-    autoMail = true, -- true / false for below option
-    mailTime = "7200", -- how often to send mail (seconds)
-    
-    --collectMail = false, -- PLANNED FEATURE NOT YET
-    --collectTime = "300", -- PLANNED FEATURE NOT YET
-    
-    autoPresents = true, -- true / false (collects presents on 5 min timer)
-    
-     sendWebhooks = true, -- waiting for executor that supports http
-     webhookUrl = "https://discord.com/api/webhooks/1072980630616424550/ZNOKsN__H2C2-ITfQOnJMUtJDddKlPzs3l3LhBoE6QYqhAi8XFkxJS4MilJE5x03QuKo"
-}
-loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/2ba71da818277b618eace56f899d9d3e.lua"))()
+task.wait(150)
+    -- Coordonatele pentru cele două locații
+    local coords2 = Vector3.new(630.8226928710938, 58.210540771484375, -2522.4541015625)
+
+    -- Obținerea personajului jucătorului local
+    local player = game.Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+    -- Funcție pentru teleportare la coordonate specifice
+    local function teleport(coords)
+        if humanoidRootPart then
+            humanoidRootPart.CFrame = CFrame.new(coords)
+        else
+            warn("HumanoidRootPart nu a fost găsit.")
+        end
+    end
+
+    -- Funcție pentru a începe loop-ul de teleportare
+    local function startTeleportLoop()
+        while true do -- începe un loop infinit
+            teleport(coords2)
+            wait(180) -- Așteaptă 15 secunde
+        end
+    end
+
+    -- Începe loop-ul imediat
+    startTeleportLoop()
+end)
+
+
+
+
+
