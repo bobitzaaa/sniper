@@ -1,48 +1,25 @@
---[[
-Credits List
-ethereum: creating the base sniper
-chocolog: providing type.huge
-Edmond: offered tips for optimization
-
-Hello from root, I won't be updating this as I have been very demotivated to update this script
-it's required to fork this for now. cya
-]]--
-
 local osclock = os.clock()
-
--- Așteaptă până când jocul este complet încărcat
 if not game:IsLoaded() then
     game.Loaded:Wait()
 end
 
--- Așteaptă 3 secunde după încărcarea completă a jocului
 task.wait(3)
-
--- Dezactivează urmărirea inactivității jucătorului
 game.Players.LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"].Enabled = false
-
--- Dezactivează randarea 3D
 game:GetService("RunService"):Set3dRenderingEnabled(false)
-
--- Obține referința către obiectul Broadcast din ReplicatedStorage
 local Booths_Broadcast = game:GetService("ReplicatedStorage").Network:WaitForChild("Booths_Broadcast")
-
--- Obține serviciul jucătorilor și lista de jucători actuali
 local Players = game:GetService('Players')
 local getPlayers = Players:GetPlayers()
 local PlayerInServer = #getPlayers
-
--- Obține serviciul HttpService, TeleportService și ReplicatedStorage
 local http = game:GetService("HttpService")
 local ts = game:GetService("TeleportService")
 local rs = game:GetService("ReplicatedStorage")
+local snipeNormal, signal
 local Library = require(rs:WaitForChild("Library"))
 
--- Inițializează variabilele pentru snipeNormal și semnal
-local snipeNormal = false
-local signal
+if snipeNormalPets == nil then
+    snipeNormalPets = false
+end
 
--- Conectează un eveniment pentru a detecta inactivitatea jucătorului și a trimite comenzi de mișcare
 local vu = game:GetService("VirtualUser")
 Players.LocalPlayer.Idled:connect(function()
    vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
@@ -50,27 +27,44 @@ Players.LocalPlayer.Idled:connect(function()
    vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
 end)
 
--- Funcție pentru procesarea informațiilor listării
 local function processListingInfo(uid, gems, item, version, shiny, amount, boughtFrom, boughtStatus, class, failMessage, snipeNormal)
     local gemamount = Players.LocalPlayer.leaderstats["💎 Diamonds"].Value
-    local snipeMessage = "||" .. Players.LocalPlayer.Name .. "||"
+    local snipeMessage ="||".. Players.LocalPlayer.Name .. "||"
+    local weburl, webContent, webcolor, webStatus
     local versionVal = { [1] = "Golden ", [2] = "Rainbow " }
     local versionStr = versionVal[version] or (version == nil and "")
-    local mention = (class == "Pet" and (Library.Directory.Pets[item].huge or Library.Directory.Pets[item].titanic)) and "<@" .. userid .. ">" or ""
+    local mention = ( class == "Pet" and (Library.Directory.Pets[item].huge or Library.Directory.Pets[item].titanic)) and "<@" .. userid .. ">" or ""
     
-    local webcolor = boughtStatus and tonumber(0x00ff00) or tonumber(0xff0000)
-    local webStatus = boughtStatus and "Success!" or failMessage
-
-    snipeMessage = snipeMessage .. (boughtStatus and " just sniped " or " failed to snipe ") .. amount .. "x **" .. versionStr
-
+    if boughtStatus then
+        webcolor = tonumber(0x00ff00)
+        snipeMessage = snipeMessage .. " just sniped ".. amount .."x "
+        webContent = mention
+        webStatus = "Success!"
+        weburl = webhook
+        if snipeNormal == true then
+            weburl = normalwebhook
+            snipeNormal = false
+        end
+    else
+        webcolor = tonumber(0xff0000)
+        weburl = webhookFail
+        webStatus = failMessage
+        snipeMessage = snipeMessage .. " failed to snipe ".. amount .."x "
+        if snipeNormal == true then
+            snipeNormal = false
+        end
+    end
+    
+    snipeMessage = snipeMessage .. "**" .. versionStr
+    
     if shiny then
         snipeMessage = snipeMessage .. " Shiny "
     end
     
     snipeMessage = snipeMessage .. item .. "**"
-
+    
     local message1 = {
-        ['content'] = mention,
+        ['content'] = webContent,
         ['embeds'] = {
             {
                 ["author"] = {
@@ -87,7 +81,7 @@ local function processListingInfo(uid, gems, item, version, shiny, amount, bough
                     },
                     {
                         ['name'] = "__Bought from:__",
-                        ['value'] = "||" .. tostring(boughtFrom) .. "||",
+                        ['value'] = "||"..tostring(boughtFrom).."||",
                     },
                     {
                         ['name'] = "__Amount:__",
@@ -99,7 +93,7 @@ local function processListingInfo(uid, gems, item, version, shiny, amount, bough
                     },      
                     {
                         ['name'] = "__PetID:__",
-                        ['value'] = "||" .. tostring(uid) .. "||",
+                        ['value'] = "||"..tostring(uid).."||",
                     },
                     {
                         ['name'] = "__Status:__",
@@ -111,21 +105,30 @@ local function processListingInfo(uid, gems, item, version, shiny, amount, bough
                     }
                 },
                 ["footer"] = {
-                    ["icon_url"] = "https://cdn.discordapp.com/attachments/1149218291957637132/1190527382583525416/new-moon-face_1f31a.png?ex=65a22006&is=658fab06&hm=55f8900eef039709c8e57c96702f8fb7df520333ec6510a81c31fc746193fbf2&",
+                    ["icon_url"] = "https://cdn.discordapp.com/attachments/1149218291957637132/1190527382583525416/new-moon-face_1f31a.png?ex=65a22006&is=658fab06&hm=55f8900eef039709c8e57c96702f8fb7df520333ec6510a81c31fc746193fbf2&", -- optional
                     ["text"] = "Heavily Modified by Root"
                 }
-            }
+            },
         }
     }
 
     local jsonMessage = http:JSONEncode(message1)
-    local success, _ = pcall(function()
-        http:PostAsync(boughtStatus and webhook or webhookFail, jsonMessage)
+    local success, webMessage = pcall(function()
+        http:PostAsync(weburl, jsonMessage)
     end)
+    if success == false then
+        local response = request({
+            Url = weburl,
+            Method = "POST",
+            Headers = {
+                ["Content-Type"] = "application/json"
+            },
+            Body = jsonMessage
+        })
+    end
 end
 
--- Funcție pentru a încerca achiziția unui element
-local function tryPurchase(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
+local function performPurchase(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
     signal = game:GetService("RunService").Heartbeat:Connect(function()
         if buytimestamp < workspace:GetServerTimeNow() then
             signal:Disconnect()
@@ -133,19 +136,16 @@ local function tryPurchase(uid, gems, item, version, shiny, amount, username, cl
         end
     end)
     repeat task.wait() until signal == nil
-
-    local boughtPet = false
-    local boughtMessage = ""
+    local boughtPet = false  -- Definim inițial `boughtPet` ca `false`
+    local boughtMessage = "" -- Definim inițial `boughtMessage` ca un șir gol
     processListingInfo(uid, gems, item, version, shiny, amount, username, boughtPet, class, boughtMessage, snipeNormal)
 end
 
--- Conectează evenimentul Broadcast pentru a trata listările
 Booths_Broadcast.OnClientEvent:Connect(function(username, message)
     if type(message) == "table" then
-        local highestTimestamp = -math.huge
+        local highestTimestamp = -math.huge -- Initialize with the smallest possible number
         local key = nil
         local listing = nil
-
         for v, value in pairs(message["Listings"] or {}) do
             if type(value) == "table" and value["ItemData"] and value["ItemData"]["data"] then
                 local timestamp = value["Timestamp"]
@@ -156,7 +156,6 @@ Booths_Broadcast.OnClientEvent:Connect(function(username, message)
                 end
             end
         end
-
         if listing then
             local buytimestamp = listing["ReadyTimestamp"]
             local listTimestamp = listing["Timestamp"]
@@ -169,24 +168,22 @@ Booths_Broadcast.OnClientEvent:Connect(function(username, message)
             local amount = tonumber(data["_am"]) or 1
             local playerid = message['PlayerID']
             local class = tostring(listing["ItemData"]["class"])
-            local unitGems = gems / amount
+            local unitGems = gems/amount
             snipeNormal = false
-                
+            
             if item == "Diamond Fishing Rod" and unitGems <= 41000000 then
-                coroutine.wrap(tryPurchase)(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
+                coroutine.wrap(performPurchase)(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
                 return
             end
         end
     end
 end)
 
--- Funcție pentru a sări la un alt server
 local function jumpToServer() 
     local sfUrl = "https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=%s&limit=%s&excludeFullGames=true" 
     local req = request({ Url = string.format(sfUrl, 15502339080, "Desc", 50) }) 
     local body = http:JSONDecode(req.Body) 
     local deep = math.random(1, 3)
-    
     if deep > 1 then 
         for i = 1, deep, 1 do 
              req = request({ Url = string.format(sfUrl .. "&cursor=" .. body.nextPageCursor, 15502339080, "Desc", 50) }) 
@@ -194,9 +191,7 @@ local function jumpToServer()
              task.wait(0.1)
         end 
     end 
-    
     local servers = {} 
-    
     if body and body.data then 
         for i, v in next, body.data do 
             if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= game.JobId then
@@ -204,24 +199,29 @@ local function jumpToServer()
             end
         end
     end
-    
     local randomCount = #servers
-    
     if not randomCount then
        randomCount = 2
     end
-    
     ts:TeleportToPlaceInstance(15502339080, servers[math.random(1, randomCount)], game:GetService("Players").LocalPlayer) 
 end
 
--- Verifică dacă numărul de jucători este mai mic decât 30 și sări la un alt server în caz afirmativ
 if PlayerInServer < 30 then
     while task.wait(10) do
         jumpToServer()
     end
 end
 
--- Verifică dacă numărul de jucători este mai mic decât 20 și sări la un alt server în caz afirmativ
+for i = 1, PlayerInServer do
+   for ii = 1,#alts do
+        if getPlayers[i].Name == alts[ii] and alts[ii] ~= Players.LocalPlayer.Name then
+            while task.wait(10) do
+                jumpToServer()
+            end
+        end
+    end
+end
+
 Players.PlayerRemoving:Connect(function(player)
     getPlayers = Players:GetPlayers()
     PlayerInServer = #getPlayers
@@ -232,7 +232,17 @@ Players.PlayerRemoving:Connect(function(player)
     end
 end) 
 
--- Așteaptă între 720 și 1000 de secunde și sări la un alt server
+Players.PlayerAdded:Connect(function(player)
+    for i = 1,#alts do
+        if player.Name == alts[i] and alts[i] ~= Players.LocalPlayer.Name then
+            task.wait(math.random(0, 60))
+            while task.wait(10) do
+                jumpToServer()
+            end
+        end
+    end
+end) 
+
 local hopDelay = math.random(720, 1000)
 
 while task.wait(1) do
