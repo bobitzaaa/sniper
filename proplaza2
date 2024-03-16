@@ -138,7 +138,7 @@ local function processListingInfo(uid, gems, item, version, shiny, amount, bough
     end
 end
 
-local function tryPurchase(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
+local buytimestamp = listing["ReadyTimestamp"] or os.time() -- Dacă cheia nu există, folosim timpul curent
     signal = game:GetService("RunService").Heartbeat:Connect(function()
     if buytimestamp < workspace:GetServerTimeNow() then
         signal:Disconnect()
