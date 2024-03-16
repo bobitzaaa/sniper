@@ -138,7 +138,7 @@ local function processListingInfo(uid, gems, item, version, shiny, amount, bough
     end
 end
 
-local buytimestamp = listing["ReadyTimestamp"] or os.time() -- Dacă cheia nu există, folosim timpul curent
+local function tryPurchase(uid, gems, item, version, shiny, amount, username, class, playerid, buytimestamp, listTimestamp, snipeNormal)
     signal = game:GetService("RunService").Heartbeat:Connect(function()
     if buytimestamp < workspace:GetServerTimeNow() then
         signal:Disconnect()
@@ -146,7 +146,7 @@ local buytimestamp = listing["ReadyTimestamp"] or os.time() -- Dacă cheia nu ex
         end
     end)
     repeat task.wait() until signal == nil
-    local boughtPet, boughtMessage = rs.Network.Booths_RequestPurchase:InvokeServer(playerid, uid)
+    local buytimestamp = listing["ReadyTimestamp"] or os.time() -- Dacă cheia nu există, folosim timpul curent
     processListingInfo(uid, gems, item, version, shiny, amount, username, boughtPet, class, boughtMessage, snipeNormal)
 end
 
