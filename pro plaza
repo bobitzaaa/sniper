@@ -13,8 +13,6 @@ while getgenv().autoBalloon do
 
     local getActiveBalloons = ReplicatedStorage.Network.BalloonGifts_GetActiveBalloons:InvokeServer()
 
-    print("getActiveBalloons:", getActiveBalloons)
-
     local allPopped = true
     for i, v in pairs(getActiveBalloons) do
         if not v.Popped then
@@ -30,7 +28,7 @@ while getgenv().autoBalloon do
             loadstring(game:HttpGet("https://raw.githubusercontent.com/fdvll/pet-simulator-99/main/serverhop.lua"))()
         end
         task.wait(getgenv().autoBalloonConfig.GET_BALLOON_DELAY)
-        break
+        continue
     end
 
     if not getgenv().autoBalloon then
@@ -73,18 +71,10 @@ while getgenv().autoBalloon do
 
         task.wait()
 
-        local giftId = balloonData.GiftId
-        local giftPosition = balloonData.Position
-        print("Popping gift from balloon")
-        LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(giftPosition)
-        task.wait(1)
-        ReplicatedStorage.Network.Crates_OpenCrate:FireServer(giftId)
-        task.wait(3)
-
         ReplicatedStorage.Network.Slingshot_Unequip:InvokeServer()
 
-        print("Popped balloon and gift, waiting " .. tostring(getgenv().autoBalloonConfig.BALLOON_DELAY) .. " seconds")
-        task.wait(getgenv().autoBalloonConfig.BALLOON_DELAY)
+        print("Popped balloon, waiting 5 seconds before next action")
+        task.wait(5) -- Așteaptă 5 secunde după ce a spart balonul înainte de a trece la următoarea acțiune
     end
 
     if getgenv().autoBalloonConfig.SERVER_HOP then
