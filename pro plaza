@@ -28,7 +28,8 @@ while getgenv().autoBalloon do
             loadstring(game:HttpGet("https://raw.githubusercontent.com/fdvll/pet-simulator-99/main/serverhop.lua"))()
         end
         task.wait(getgenv().autoBalloonConfig.GET_BALLOON_DELAY)
-        continue
+        -- Folosim `break` pentru a ieși din buclă și a continua la următorul ciclu
+        break
     end
 
     if not getgenv().autoBalloon then
