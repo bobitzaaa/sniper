@@ -13,6 +13,8 @@ while getgenv().autoBalloon do
 
     local getActiveBalloons = ReplicatedStorage.Network.BalloonGifts_GetActiveBalloons:InvokeServer()
 
+    print("getActiveBalloons:", getActiveBalloons)
+
     local allPopped = true
     for i, v in pairs(getActiveBalloons) do
         if not v.Popped then
@@ -28,7 +30,7 @@ while getgenv().autoBalloon do
             loadstring(game:HttpGet("https://raw.githubusercontent.com/fdvll/pet-simulator-99/main/serverhop.lua"))()
         end
         task.wait(getgenv().autoBalloonConfig.GET_BALLOON_DELAY)
-        break -- Ieșim din buclă și continuăm la următorul ciclu
+        break
     end
 
     if not getgenv().autoBalloon then
@@ -71,15 +73,13 @@ while getgenv().autoBalloon do
 
         task.wait()
 
-        -- Adăugați aici manipularea cadourilor din balon
         local giftId = balloonData.GiftId
         local giftPosition = balloonData.Position
         print("Popping gift from balloon")
-        -- Simulăm că jucătorul se deplasează către cadou și îl deschide
         LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(giftPosition)
-        task.wait(1) -- Așteptăm un scurt timp pentru a deschide cadoul
+        task.wait(1)
         ReplicatedStorage.Network.Crates_OpenCrate:FireServer(giftId)
-        task.wait(3) -- Așteptăm o perioadă de timp după deschiderea cadoului
+        task.wait(3)
 
         ReplicatedStorage.Network.Slingshot_Unequip:InvokeServer()
 
