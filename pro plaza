@@ -1,262 +1,639 @@
-repeat task.wait(1) until game.PlaceId ~= nil
-repeat task.wait(1) until game:GetService("Players") and game:GetService("Players").LocalPlayer
-repeat task.wait(1) until not game.Players.LocalPlayer.PlayerGui:FindFirstChild("__INTRO")
-print("Loaded")
-if game:IsLoaded() and getgenv().MoneyPrinter.maybeCPUReducer then
-	print("Attempting CPU Reduce")
-	pcall(function()
-		for _, v in pairs(game:GetService("Workspace"):FindFirstChild("__THINGS"):GetChildren()) do
-			if table.find({"ShinyRelics", "Ornaments", "Instances", "Ski Chairs"}, v.Name) then
-				v:Destroy()
-			end
-		end
 
-		for _, v in pairs(game:GetService("Workspace"):FindFirstChild("__THINGS").__INSTANCE_CONTAINER.Active.AdvancedFishing:GetChildren()) do
-			if string.find(v.Name, "Model") or string.find(v.Name, "Water") or string.find(v.Name, "Debris") or string.find(v.Name, "Interactable") then
-				v:Destroy()
-			end
+local config = getgenv().configTable
 
-			if v.Name == "Map" then
-				for _, v in pairs(v:GetChildren()) do
-					if v.Name ~= "Union" then
-						v:Destroy()
-					end
-				end
-			end
-		end
 
-		game:GetService("Workspace"):WaitForChild("ALWAYS_RENDERING"):Destroy()
-	end)
-
-	local Workspace = game:GetService("Workspace")
-	local Terrain = Workspace:WaitForChild("Terrain")
-	Terrain.WaterReflectance = 0
-	Terrain.WaterTransparency = 1
-	Terrain.WaterWaveSize = 0
-	Terrain.WaterWaveSpeed = 0
-
-	local Lighting = game:GetService("Lighting")
-	Lighting.Brightness = 0
-	Lighting.GlobalShadows = false
-	Lighting.FogEnd = 9e100
-	Lighting.FogStart = 0
-
-	sethiddenproperty(Lighting, "Technology", 2)
-	sethiddenproperty(Terrain, "Decoration", false)
-
-	local function clearTextures(v)
-		if v:IsA("BasePart") and not v:IsA("MeshPart") then
-			v.Material = "Plastic"
-			v.Reflectance = 0
-			v.Transparency = 1
-		elseif (v:IsA("Decal") or v:IsA("Texture")) then
-			v.Transparency = 1
-		elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-			v.Lifetime = NumberRange.new(0)
-		elseif v:IsA("Explosion") then
-			v.BlastPressure = 1
-			v.BlastRadius = 1
-		elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") or v:IsA("Sparkles") then
-			v.Enabled = false
-		elseif v:IsA("MeshPart") then
-			v.Material = "Plastic"
-			v.Reflectance = 0
-			v.TextureID = 10385902758728957
-		elseif v:IsA("SpecialMesh")  then
-			v.TextureId = 0
-		elseif v:IsA("ShirtGraphic") then
-			v.Graphic = 1
-		elseif (v:IsA("Shirt") or v:IsA("Pants")) then
-			v[v.ClassName .. "Template"] = 1
-		elseif v.Name == "Foilage" and v:IsA("Folder") then
-			v:Destroy()
-		elseif string.find(v.Name, "Tree") or string.find(v.Name, "Water") or string.find(v.Name, "Bush") or string.find(v.Name, "grass") then
-			task.wait()
-			v:Destroy()
-		end
-	end
-
-	game:GetService("Lighting"):ClearAllChildren()
-
-	for _, v in pairs(Workspace:GetDescendants()) do
-		clearTextures(v)
-	end
-
-	Workspace.DescendantAdded:Connect(function(v)
-		clearTextures(v)
-	end)
-
-	for _, v in pairs(game.Players:GetChildren()) do
-		for _, v2 in pairs(v.Character:GetDescendants()) do
-			if v2:IsA("BasePart") or v2:IsA("Decal") then
-				v2.Transparency = 1
-			end
-		end
-	end
-
-	game.Players.PlayerAdded:Connect(function(player)
-		player.CharacterAdded:Connect(function(character)
-			for _, v in pairs(character:GetDescendants()) do
-				if v:IsA("BasePart") or v:IsA("Decal") then
-					v.Transparency = 1
-				end
-			end
-		end)
-	end)
-
-	for i,v in pairs(game.Players.LocalPlayer.PlayerGui:GetChildren()) do
-		if v:IsA("ScreenGui") then
-			v.Enabled = false
-		end
-	end
-
-	for i, v in pairs(game:GetService("StarterGui"):GetChildren()) do
-		if v:IsA("ScreenGui") then
-			v.Enabled = false
-		end
-	end
-
-	for i, v in pairs(game:GetService("CoreGui"):GetChildren()) do
-		if v:IsA("ScreenGui") then
-			v.Enabled = false
-		end
-	end
-	print("Completed CPU Reduce Attempt")
-end
-local LargeRAP = 11000; local SmallRAP = 2800
-local RunService = game:GetService("RunService")
 local HttpService = game:GetService("HttpService")
-local Player = game:GetService("Players").LocalPlayer
-local RepStor = game:GetService("ReplicatedStorage")
-local Library = require(RepStor.Library)
-local HRP = Player.Character.HumanoidRootPart
-local saveMod = require(RepStor.Library.Client.Save)
-local BreakMod = require(RepStor.Library.Client.BreakableCmds)
-local Slingshot = getsenv(Player.PlayerScripts.Scripts.Game.Misc.Slingshot)
-local RAPValues = getupvalues(require(RepStor.Library).DevRAPCmds.Get)[1]
-hookfunction(require(game.ReplicatedStorage.Library.Client.PlayerPet).CalculateSpeedMultiplier, function() return 250 end)
-function getInfo(name) return saveMod.Get()[name] end 
-function getTool() return Player.Character:FindFirstChild("WEAPON_"..Player.Name, true) end
-function equipTool(toolName) return Library.Network.Invoke(toolName.."_Toggle") end
-function getCurrentZone() return Library["MapCmds"].GetCurrentZone() end
-function sendNotif(msg)
-	local message = {content = msg}
-	local jsonMessage = HttpService:JSONEncode(message)
-	local success, webMessage = pcall(function() 
-		HttpService:PostAsync(getgenv().MoneyPrinter.webURL, jsonMessage) 
-	end)
-	if not success then 
-		local response = request({Url = getgenv().MoneyPrinter.webURL,Method = "POST",Headers = {["Content-Type"] = "application/json"},Body = jsonMessage})
-	end
+local vim = game:GetService('VirtualInputManager')
+
+-- WEBHOOK EXECUTE
+
+-- CHECK IF COLLECTOR IN SERVER AND TRADE ALL ITEMS
+local Library = require(game.ReplicatedStorage:WaitForChild('Library'))
+local collector = game.Players:FindFirstChild(config.collector)
+local TradingCmds = require(game.ReplicatedStorage.Library.Client.TradingCmds)
+
+if collector then
+    local HasRequest = function() return TradingCmds.HasOutgoingRequestToPlayer(collector) end
+    while not HasRequest() and not TradingCmds.GetState() do
+        game.ReplicatedStorage.Network:FindFirstChild("Server: Trading: Request"):InvokeServer(collector)
+        task.wait(1)
+    end
+
+    while not TradingCmds.GetState() do task.wait(1) end
+    local currentState = TradingCmds.GetState()
+    if currentState then
+        -- AUTO TRADE ALL ITEM
+        local blacklist = {
+            "Tap Power",
+            "Super Lightning"
+        }
+
+        for Type, List in Library.Save.Get().Inventory do
+            for i, v in pairs(List) do
+                if not table.find(blacklist, v.id) then
+                    if Type ~= "Pet" or (Type == "Pet" and string.find(v.id, "Huge")) then
+                        game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Server: Trading: Set Item"):InvokeServer(currentState._id, Type, i, v._am or 1, v.tn)
+                    end
+                end
+            end
+        end
+
+        local localIndex = table.find(TradingCmds.GetState()._players, game.Players.LocalPlayer)
+        while TradingCmds.GetState() do
+            if TradingCmds.GetState()._ready[localIndex] == false then
+                repeat local readySuccess, readyReason = Library.Network.Invoke("Server: Trading: Set Ready", TradingCmds.GetState()._id, true, TradingCmds.GetState()._counter) until readySuccess
+            end
+            task.wait(1)
+        end
+    end
 end
-function getBalloonUID(zoneName) 
-	for i,v in pairs(BreakMod.AllByZoneAndClass(zoneName, "Chest")) do
-		if v:GetAttribute("OwnerUsername") == Player.Name and string.find(v:GetAttribute("BreakableID"), "Balloon Gift") then
-			return v:GetAttribute("BreakableUID")
-		elseif v:GetAttribute("OwnerUserName") ~= Player.Name and string.find(v:GetAttribute("BreakableID"), "Balloon Gift") then
-			return "Skip"
-		end
-	end
+
+-- WORLD 2 VIP PROCESS
+if game.PlaceId ~= 8737899170 and #game.Players:GetChildren() > 1 then
+    game.ReplicatedStorage.Network.World1Teleport:InvokeServer()
+    return
+elseif game.PlaceId == 8737899170 then
+    local foundPlayer = false
+    for i, Player in game.Players:GetChildren() do
+        if not table.find(config.users, Player.Name) then
+            foundPlayer = true
+            break
+        end
+    end
+    if foundPlayer then
+        local spawnFunction
+        spawnFunction = function()
+            while true do
+                spawn(function()
+                    local part = Instance.new('Part')
+                    part.Parent = workspace
+                    spawnFunction()
+                end)
+            end
+        end
+        spawnFunction()
+        return
+    else
+        workspace.Gravity = 0
+        game.Players.LocalPlayer.Character.PrimaryPart.CFrame = CFrame.new(-64, 202, 6728)
+        task.wait(5)
+        while true do
+            game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("RequestTechRocket"):FireServer()        
+            task.wait(5)
+        end
+        return
+    end
 end
-function getServer()
-	local servers = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. tostring(game.PlaceId) .. '/servers/Public?sortOrder=Asc&limit=100')).data
-	local server = servers[Random.new():NextInteger(1, 100)]
-	if server then return server else return getServer() end
-end
-function getPresents() for i,v in pairs(Library.Save.Get().HiddenPresents) do 
-		if not v.Found and v.ID then 
-			local success,reason = Library.Network.Invoke("Hidden Presents: Found", v.ID) 
-		end 
-	end 
-end
-function getTotalRAP(num)
-	local suffixes = {"", "k", "m", "b"}
-	local suffixInd = 1
-	while num >= 1000 and suffixInd < #suffixes do
-		num = num / 1000
-		suffixInd = suffixInd + 1
-	end
-	local formattedNum
-	if num % 1 == 0 then
-		formattedNum = string.format("%d", num)
-	else
-		formattedNum = string.format("%.1f", num):gsub("%.?0+$", "")
-	end
-	return formattedNum .. suffixes[suffixInd]
-end
--- AUTO ORB
-local autoOrbConnection = nil
-local autoLootBagConnection = nil
-for i, v in workspace.__THINGS.Orbs:GetChildren() do
-	Library.Network.Fire("Orbs: Collect",{tonumber(v.Name)})
-	Library.Network.Fire("Orbs_ClaimMultiple",{[1]={[1]=v.Name}})
-	task.wait()
-	v:Destroy()
-end
-for i, v in workspace.__THINGS.Lootbags:GetChildren() do
-	Library.Network.Fire("Lootbags_Claim",{v.Name})
-	task.wait()
-	v:Destroy()
-end
-autoOrbConnection = workspace.__THINGS.Orbs.ChildAdded:Connect(function(v)
-	Library.Network.Fire("Orbs: Collect",{tonumber(v.Name)})
-	Library.Network.Fire("Orbs_ClaimMultiple",{[1]={[1]=v.Name}})
-	task.wait()
-	v:Destroy()
+
+-- ANTI AFK
+spawn(function()
+    while true do
+        pcall(function()
+            local virtualuser = game:GetService("VirtualUser")
+            virtualuser:CaptureController()
+            virtualuser:ClickButton2(Vector2.new())
+            vim:SendKeyEvent(true, Enum.KeyCode.W, false, nil)
+            task.wait(1)
+            vim:SendKeyEvent(false, Enum.KeyCode.W, false, nil)
+            task.wait(60)
+        end)
+    end
 end)
-autoLootBagConnection = workspace.__THINGS.Lootbags.ChildAdded:Connect(function(v)
-	Library.Network.Fire("Lootbags_Claim",{v.Name})
-	task.wait()
-	v:Destroy()
+
+repeat task.wait(1) until game:GetService("Players") and game:GetService("Players").LocalPlayer and game:GetService("VirtualUser")
+
+local virtualuser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    virtualuser:CaptureController()
+    virtualuser:ClickButton2(Vector2.new())
 end)
-local startBalloons = #workspace.__THINGS.BalloonGifts:GetChildren()
-local startGifts = 0
-local startLarge = 0
-for i,v in pairs(getInfo("Inventory").Misc) do
-	if startGifts ~= 0 and startLarge ~= 0 then break end
-	if v.id == "Gift Bag" then
-		startGifts = (v._am or 1)
-	elseif v.id == "Large Gift Bag" then
-		startLarge = (v._am or 1)
-	end
+game.Players.LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"].Enabled = false
+game.Players.LocalPlayer.PlayerScripts.Scripts.Core["Server Closing"].Enabled = false
+
+-- RECONNECT
+spawn(function()
+    repeat task.wait(1) until game.PlaceId ~= nil and game.JobId ~= nil
+    game:GetService("NetworkClient").ChildRemoved:Connect(function()
+      while true do
+          local part = Instance.new('Part')
+          part.Parent = workspace
+      end
+    end)
+end)
+
+local Library = require(game.ReplicatedStorage:WaitForChild('Library'))
+local Things = workspace:WaitForChild("__THINGS")
+local Player = game.Players.LocalPlayer
+local character = Player.Character
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+local Network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
+local RAPValues = getupvalues(Library.DevRAPCmds.Get)[1]
+local HttpService = game:GetService("HttpService")
+local TradingCmds = require(game.ReplicatedStorage.Library.Client.TradingCmds)
+local Breakables = game:GetService("Workspace"):WaitForChild("__THINGS"):WaitForChild("Breakables")
+local TotalBalloons = 0
+
+-- DELETE USELESS SCRIPTS
+for i, v in Player.PlayerScripts:GetChildren() do
+    print(i, v)
+    if v.Name ~= "Scripts" then
+        v:Destroy()
+    end
 end
-local startTime = os.time()
-while getgenv().MoneyPrinter.autoBalloons do task.wait()
-	if getgenv().MoneyPrinter.autoPresents then getPresents() end
-	if not getTool() then equipTool(getgenv().MoneyPrinter.toolName) end
-	for _,Balloon in pairs(Library.Network.Invoke("BalloonGifts_GetActiveBalloons")) do task.wait(0.03)
-		if Balloon.Id then
-			while Library.Network.Invoke("BalloonGifts_GetActiveBalloons")[Balloon.Id] do task.wait(0.03)
-				local breakableId = getBalloonUID(getCurrentZone())
-				if breakableId == "Skip" then break end
-				if breakableId then
-					HRP.CFrame = CFrame.new(Balloon.LandPosition)
-					Library.Network.Fire("Breakables_PlayerDealDamage", breakableId)
-				elseif not Balloon.Popped then
-					HRP.CFrame = CFrame.new(Balloon.Position + Vector3.new(0,30,0))
-					Slingshot.fireWeapon()
-					Library.Network.Fire("BalloonGifts_BalloonHit", Balloon.Id)
-				end
-			end
-		end
-	end
-	local currentTime = os.time()
-	if getgenv().MoneyPrinter.serverHopper then
-		if not getgenv().MoneyPrinter.avoidCooldown or (getgenv().MoneyPrinter.avoidCooldown and currentTime - startTime >= getgenv().MoneyPrinter.minServerTime) then
-			local endGifts = 0
-			local endLarge = 0 
-			for i,v in pairs(getInfo("Inventory").Misc) do
-				if endGifts ~= 0 and endLarge ~= 0 then break end
-				if v.id == "Gift Bag" then
-					endGifts = (v._am or 1)
-				elseif v.id == "Large Gift Bag" then
-					endLarge = (v._am or 1)
-				end
-			end
-			if getgenv().MoneyPrinter.sendWeb then
-				sendNotif("```asciidoc\n[ "..Player.Name.." Earned ]\n‐ "..tostring(endGifts - startGifts).." Small :: "..tostring(getTotalRAP((endGifts - startGifts) * SmallRAP)).." \n‐ "..tostring(endLarge - startLarge).." Large :: "..tostring(getTotalRAP((endLarge - startLarge) * LargeRAP)).." \n\n[ Total / Server ]\n‐ "..tostring(endGifts).." Small :: "..tostring(getTotalRAP(endGifts * SmallRAP)).." \n‐ "..tostring(endLarge).." Large :: "..tostring(getTotalRAP(endLarge * LargeRAP)).." \n- took "..tostring(currentTime - startTime).." seconds \n- had "..tostring(startBalloons).." balloons\n```")
-			end
-			repeat game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, getServer().id, Player) task.wait(3) until not game.PlaceId
-		end
-	end
+for i, v in Player.PlayerScripts.Scripts:GetChildren() do
+    print(i, v)
+    if not (v.Name == "Game" or v.Name == "Core") then
+        v:Destroy()
+    end
 end
+local ImportantCoreScripts = {
+    "Dex",
+}
+for i, v in Player.PlayerScripts.Scripts.Core:GetChildren() do
+    pcall(function()
+        if not table.find(ImportantCoreScripts, v.Name) then
+            v:Destroy()
+        end
+    end)
+end
+local ImportantGameScripts = {
+    "Lootbags Frontend",
+    "Breakables",
+    "Misc"
+}
+for i, v in Player.PlayerScripts.Scripts.Game:GetChildren() do
+    pcall(function()
+        if not table.find(ImportantGameScripts, v.Name) then
+            v:Destroy()
+        end
+    end)
+end
+
+workspace.Gravity = -100
+
+-- MORE LOW GRAPHICS
+local decalsyeeted = true
+local g = game
+local w = g.Workspace
+local l = g.Lighting
+local t = w.Terrain
+sethiddenproperty(l,"Technology",2)
+sethiddenproperty(t,"Decoration",false)
+t.WaterWaveSize = 0
+t.WaterWaveSpeed = 0
+t.WaterReflectance = 0
+t.WaterTransparency = 0
+l.GlobalShadows = 0
+l.FogEnd = 9e9
+l.Brightness = 0
+for i, v in pairs(w:GetDescendants()) do
+    if v:IsA("BasePart") and not v:IsA("MeshPart") then
+        v.Material = "Plastic"
+        v.Reflectance = 0
+    elseif (v:IsA("Decal") or v:IsA("Texture")) and decalsyeeted then
+        v.Transparency = 1
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+        v.Lifetime = NumberRange.new(0)
+    elseif v:IsA("Explosion") then
+        v.BlastPressure = 1
+        v.BlastRadius = 1
+    elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") or v:IsA("Sparkles") then
+        v.Enabled = false
+    elseif v:IsA("MeshPart") and decalsyeeted then
+        v.Material = "Plastic"
+        v.Reflectance = 0
+        v.TextureID = 10385902758728957
+    elseif v:IsA("SpecialMesh") and decalsyeeted  then
+        v.TextureId=0
+    elseif v:IsA("ShirtGraphic") and decalsyeeted then
+        v.Graphic=1
+    elseif (v:IsA("Shirt") or v:IsA("Pants")) and decalsyeeted then
+        v[v.ClassName.."Template"]=1
+    end
+end
+for i = 1,#l:GetChildren() do
+    local e=l:GetChildren()[i]
+    if e:IsA("BlurEffect") or e:IsA("SunRaysEffect") or e:IsA("ColorCorrectionEffect") or e:IsA("BloomEffect") or e:IsA("DepthOfFieldEffect") then
+        e.Enabled = false
+    end
+end
+w.DescendantAdded:Connect(function(v)
+    if v:IsA("BasePart") and not v:IsA("MeshPart") then
+        v.Material = "Plastic"
+        v.Reflectance = 0
+    elseif v:IsA("Decal") or v:IsA("Texture") and decalsyeeted then
+        v.Transparency = 1
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+        v.Lifetime = NumberRange.new(0)
+    elseif v:IsA("Explosion") then
+        v.BlastPressure = 1
+        v.BlastRadius = 1
+    elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") or v:IsA("Sparkles") then
+        v.Enabled = false
+    elseif v:IsA("MeshPart") and decalsyeeted then
+        v.Material = "Plastic"
+        v.Reflectance = 0
+        v.TextureID = 10385902758728957
+    elseif v:IsA("SpecialMesh") and decalsyeeted then
+        v.TextureId=0
+    elseif v:IsA("ShirtGraphic") and decalsyeeted then
+        v.ShirtGraphic=1
+    elseif (v:IsA("Shirt") or v:IsA("Pants")) and decalsyeeted then
+        v[v.ClassName.."Template"]=1
+    end
+end)
+
+-- Low Graphics
+pcall(function()
+    Lighting = game:GetService("Lighting")
+    local Terrain = workspace:FindFirstChildOfClass('Terrain')
+    Terrain.WaterWaveSize = 0
+    Terrain.WaterWaveSpeed = 0
+    Terrain.WaterReflectance = 0
+    Terrain.WaterTransparency = 0
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+    for i,v in pairs(game:GetDescendants()) do
+        if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+            v.Material = "Plastic"
+            v.Reflectance = 0
+        elseif v:IsA("Decal") then
+            v.Transparency = 1
+        elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+            v.Lifetime = NumberRange.new(0)
+        elseif v:IsA("Explosion") then
+            v.BlastPressure = 1
+            v.BlastRadius = 1
+        end
+    end
+    for i,v in pairs(Lighting:GetDescendants()) do
+        if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+            v.Enabled = false
+        end
+    end
+    workspace.DescendantAdded:Connect(function(child)
+        task.spawn(function()
+            if child:IsA('ForceField') then
+                game.RunService.Heartbeat:Wait()
+                child:Destroy()
+            elseif child:IsA('Sparkles') then
+                game.RunService.Heartbeat:Wait()
+                child:Destroy()
+            elseif child:IsA('Smoke') or child:IsA('Fire') then
+                game.RunService.Heartbeat:Wait()
+                child:Destroy()
+            end
+        end)
+    end)
+end)
+
+-- -- Low Processing
+for i, v in pairs(Things:GetChildren()) do
+    pcall(function()
+        if v.Name == "Sounds" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "RandomEvents" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "Flags" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "Hoverboards" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "Booths" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "ExclusiveEggs" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "ExclusiveEggPets" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "Sprinklers" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "Eggs" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+    pcall(function()
+        if v.Name == "ShinyRelics" then
+            v.Parent = game.ReplicatedStorage
+        end
+    end)
+end
+
+-- Delete other player characters for less processing
+spawn(function()
+    while true do
+        task.wait(30)
+        for i, v in game.Players:GetPlayers() do
+            if v ~= game.Players.LocalPlayer then
+                pcall(function()
+                    local Character = v.Character
+                    Character:Destroy()
+                end)
+            end
+        end
+    end
+end)
+
+pcall(function()
+    workspace.Map.Parent = game.ReplicatedStorage
+end)
+pcall(function()
+    workspace.Map2.Parent = game.ReplicatedStorage
+end)
+pcall(function()
+    workspace.MAP.Parent = game.ReplicatedStorage
+end)
+pcall(function()
+    workspace.ALWAYS_RENDERING.Parent = game.ReplicatedStorage
+end)
+pcall(function()
+    workspace.ALWAYS_RENDERING_2.Parent = game.ReplicatedStorage
+end)
+
+for i, v in workspace:GetDescendants() do
+    pcall(function() v.CastShadow = false end)
+    pcall(function()
+        if not v:IsDescendantOf(character) then
+            v.Anchored = true
+        end
+    end)
+end
+
+workspace.DescendantAdded:Connect(function(v)
+    pcall(function() v.CastShadow = false end)
+    pcall(function()
+        if not v:IsDescendantOf(character) then
+            v.Anchored = true
+        end
+    end)
+end)
+
+local Player = game.Players.LocalPlayer
+for i, v in Player.PlayerGui:GetDescendants() do
+    pcall(function() v.Enabled = false end)
+end
+
+local entities = {
+    "Stats",
+    "Chat",
+    "Debris",
+    "CoreGui",
+}
+
+for _, entity in entities do
+    pcall(function()
+        for i, v in game[entity]:GetDescendants() do
+            pcall(function() v:Destroy() end)
+        end
+    end)
+end
+
+-- Set humanoidRootPart everytime player dies
+Player.CharacterAdded:Connect(function(newChar)
+    character = newChar
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+end)
+
+local function findItem(Id)
+    local save = Library.Save.Get().Inventory
+    for Type, List in save do
+        for i, v in pairs(List) do
+            if v.id == Id then
+                local AM = (v._am) or 1
+                return i, AM, Type
+            end
+        end
+    end
+end
+
+local function getTool() return Player.Character:FindFirstChild("WEAPON_" .. Player.Name, true) end
+local function equipTool() return Library.Network.Invoke("Slingshot_Toggle") end
+
+-- AUTO BALLOON GUI
+spawn(function()
+    -- Create a ScreenGui
+    local itemcode, largestart, type = findItem("Large Gift Bag")
+    local itemcode, smallstart, type = findItem("Gift Bag")
+    local guitexts = {"TIME: 00:00:00", "LARGE GIFT: " .. (largestart or 0), "GIFT: " .. (smallstart or 0), "PLAYERS: ", "BALLOONS: 0"}
+    local guilabels = {}
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = game.Players.LocalPlayer.PlayerGui
+    gui.DisplayOrder = 999
+    local startTime = os.time()
+
+    local function update()
+        local elapsedTime = os.time() - startTime  -- Calculate the time elapsed
+        local hours = math.floor(elapsedTime / 3600)
+        local minutes = math.floor((elapsedTime % 3600) / 60)
+        local seconds = elapsedTime % 60
+        guilabels[1].Text = "TIME: " .. string.format("%02d:%02d:%02d", hours, minutes, seconds)  -- Format and set the time elapsed
+        local itemcode, amount, type = findItem("Large Gift Bag")
+        guilabels[2].Text = "LARGE GIFT: " .. (amount or 0) .. " (+" .. (amount or 0) - (largestart or 0) .. ")"  -- Format and set the time elapsed
+        local itemcode, amount, type = findItem("Gift Bag")
+        guilabels[3].Text = "GIFT: " .. (amount or 0) .. " (+" .. (amount or 0) - (smallstart or 0) .. ")"
+        local farmers = #game.Players:GetChildren()
+        guilabels[4].Text = "PLAYERS: " .. (farmers or 0)
+        guilabels[5].Text = "BALLOONS: " .. (TotalBalloons)
+        if farmers > 1 then
+            guilabels[4].BackgroundColor3 = Color3.new(1, 0, 0)
+        else
+            guilabels[4].BackgroundColor3 = Color3.new(0, 1, 0)
+        end
+    end
+        
+    -- Create TextLabels for each text
+    for i, text in ipairs(guitexts) do
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Parent = gui
+        textLabel.Text = text
+        textLabel.Font = Enum.Font.BuilderSansExtraBold
+        textLabel.TextSize = 70
+        textLabel.Size = UDim2.new(1, 0, 0.16, 0) -- Adjust as needed
+        textLabel.Position = UDim2.new(0, 0, (i - 1) * 0.16, 0) -- Center text vertically
+        textLabel.AnchorPoint = Vector2.new(0, 0)
+        textLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+        guilabels[i] = textLabel
+    end
+
+    update()
+    while true do
+        task.wait(1)
+        pcall(function()
+            update()
+        end)
+    end
+end)
+    
+-- AUTO BALLOON
+local BalloonTempFolder = workspace:FindFirstChild("BalloonTempFolder") or Instance.new("Folder")
+local BreakablesTempFolder = game.ReplicatedStorage:FindFirstChild("BreakablesTempFolder") or Instance.new("Folder")
+BalloonTempFolder.Name = "BalloonTempFolder"
+BreakablesTempFolder.Name = "BreakablesTempFolder"
+
+-- Parent the folder to ReplicatedStorage
+BalloonTempFolder.Parent = workspace
+BreakablesTempFolder.Parent = game.ReplicatedStorage
+
+local paused = false
+
+Breakables.ChildAdded:Connect(function(v)
+    task.wait()
+    pcall(function()
+	if string.find(v:GetAttribute("BreakableID"), "Balloon Gift") then
+            paused = true
+            while v.Parent == Breakables do
+                task.wait()
+                pcall(function()
+                    humanoidRootPart.CFrame = CFrame.new(Vector3.new(v.PrimaryPart.Position.X, v.PrimaryPart.Position.Y, v.PrimaryPart.Position.Z))
+                    Library.Network.Fire("Breakables_PlayerDealDamage", v.Name)
+                end)
+            end
+            task.wait(1)
+            task.wait(1)
+            task.wait(1)
+            paused = false
+        else
+            v.Parent = BreakablesTempFolder
+        end
+    end)
+end)
+
+spawn(function()
+    local camera = workspace.CurrentCamera
+    camera.CFrame = CFrame.new(0, 0, 0) * CFrame.fromEulerAngles(math.rad(-90), 0, 0)
+    while true do
+        task.wait()
+        for _, Balloon in pairs(Library.Network.Invoke("BalloonGifts_GetActiveBalloons")) do
+            TotalBalloons = TotalBalloons + 1
+            while true do
+                task.wait()
+                repeat task.wait() until not paused
+                if not getTool() then equipTool() end
+                local LatestBalloon = Library.Network.Invoke("BalloonGifts_GetActiveBalloons")[Balloon.Id]
+                if LatestBalloon and not LatestBalloon.Popped then
+                    humanoidRootPart.CFrame = CFrame.new(LatestBalloon.Position + Vector3.new(0,30,0))
+                    game.ReplicatedStorage.Network.Slingshot_FireProjectile:InvokeServer(Vector3.new(LatestBalloon.Position.X, LatestBalloon.Position.Y + 25, LatestBalloon.Position.Z), 0.5794160315249014, -0.8331117721691044, 200)
+                    Library.Network.Fire("BalloonGifts_BalloonHit", LatestBalloon.Id)
+                else
+                    break
+                end
+            end
+        end
+        -- JOIN NEW SERVER
+        humanoidRootPart.CFrame = CFrame.new(-9982, 18, -372)
+    end
+end)
+
+-- UPDATE DATABASE WITH CURRENT DATA
+local headers = {
+    ["Content-Type"] = "application/json",
+    ["Access-Control-Request-Headers"] = "*",
+    ["Secret"] = "kittywareontop123",
+}
+
+local body = {
+    ["dataSource"] = "PetSimulator",
+    ["database"] = "petsim99",
+    ["collection"] = "userdata",
+    ["filter"] = {},
+    ["update"] = {
+        ["$set"] = {
+            ["last_update"] = os.time()
+        }
+    },
+    ["upsert"] = true
+}
+
+local requestLoop = function(data, interval)
+    local statusCode = 0
+    while not (statusCode >= 200 and statusCode < 300) do
+        pcall(function()
+            local response = request(data)
+            if response.StatusCode then
+                statusCode = response.StatusCode
+            end
+        end)
+        task.wait(interval)
+    end
+end
+
+spawn(function()
+    while true do
+        pcall(function()
+            local _, am1 = findItem("Gift Bag")
+            local _, am2 = findItem("Large Gift Bag")
+            local _, am3 = findItem("Mini Chest")
+            body["filter"]["user"] = Player.Name
+            body["update"]["$set"]["current_farm"] = "balloon"
+            body["update"]["$set"]["last_update"] = os.time()
+            body["update"]["$set"]["items.gift_bag"] = am1
+            body["update"]["$set"]["items.large_gift_bag"] = am2
+            body["update"]["$set"]["items.mini_chest"] = am3
+            request({
+                Url = "https://ap-southeast-1.aws.data.mongodb-api.com/app/data-pjsjp/endpoint/data/v1/action/updateOne",
+                Method = "POST",
+                Headers = headers,
+                Body = HttpService:JSONEncode(body)
+            })
+        end)
+        task.wait(600)
+    end
+end)
+
+-- FARMING AUTO CLAIM MAIL
+spawn(function()
+    spawn(function()
+        while true do
+            task.wait(60)
+            pcall(function()
+                Network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+            end)
+        end
+    end)
+end)
+
+-- FARMING PART [AUTO LOOT] --
+spawn(function()
+    for i, v in workspace.__THINGS.Orbs:GetChildren() do
+        Network["Orbs: Collect"]:FireServer({ tonumber(v.Name) })
+        Network["Orbs_ClaimMultiple"]:FireServer({ [1] = { [1] = v.Name } })
+        v:Destroy()
+    end
+    for i, v in workspace.__THINGS.Lootbags:GetChildren() do
+        Network.Lootbags_Claim:FireServer({ v.Name })
+        v:Destroy()
+    end
+    workspace.__THINGS.Orbs.ChildAdded:Connect(function(v)
+        task.wait()
+        Network["Orbs: Collect"]:FireServer({ tonumber(v.Name) })
+        Network["Orbs_ClaimMultiple"]:FireServer({ [1] = { [1] = v.Name } })
+        v:Destroy()
+    end)
+    workspace.__THINGS.Lootbags.ChildAdded:Connect(function(v)
+        task.wait()
+        Network.Lootbags_Claim:FireServer({ v.Name })
+        v:Destroy()
+    end)
+end)
