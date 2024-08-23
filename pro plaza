@@ -1,1736 +1,906 @@
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local config = getgenv().configTable
+if not config then return end
 
- local Window = Rayfield:CreateWindow({
-   Name = "🔥 Bobo Hub |Pixel Incremental 2 🔫",
-   LoadingTitle = "Pixel Incremental 2 💥",
-   LoadingSubtitle = "by Bobo Regele",
-   ConfigurationSaving = {
-      Enabled = true,
-      FolderName = ConfigBoboHub,
-      FileName = "Bobo Hub"
-   },
-   Discord = {
-      Enabled = true,
-      Invite = "https://discord.gg/P4cmPvsh",
-      RememberJoins = true
-   },
-   KeySystem = false,
-   KeySettings = {
-      Title = "Bobo Hub",
-      Subtitle = "Key System",
-      Note = "Key In Discord Server",
-      FileName = "Bobo Regele",
-      SaveKey = false,
-      GrabKeyFromSite = true,
-      Key = {"Key"}
-   }
- })
+local HttpService = game:GetService("HttpService")
+local encodedCollection
+local Collection
 
-
- local MainTab = Window:CreateTab("🏠Auto Upgrades!", nil)
- local MainSection = MainTab:CreateSection("Pixel Upgrades")
-
- 
--- UPGRADES:
-
--- PIXEL UPGRADES, PRIMUL UPGRADE
-local function sendUpgradeRequest1()
-    local args = {
-        [1] = "1_1",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
- end
- 
- local PixelBoostTimer = nil
- local checking = false
- 
- local function StartPixelBoost()
-    PixelBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then
-            checking = true
-            sendUpgradeRequest1()
-            wait(1.5)
-            checking = false
-        end
+while true do
+    pcall(function()
+        encodedCollection = request({Url = "https://biggamesapi.io/api/collection/Pets", Method = "GET",Headers = {["Content-Type"] = "application/json"}})
+        Collection = game:GetService("HttpService"):JSONDecode(encodedCollection.Body)
     end)
- end
- 
- local function StopPixelBoost()
-    if PixelBoostTimer then
-        PixelBoostTimer:Disconnect()
-        PixelBoostTimer = nil
+    if Collection then break end
+    task.wait(5)
+end
+
+-- RECONNECT
+spawn(loadstring(game:HttpGet("https://raw.githubusercontent.com/GrandmaHasSomeSoftHands/UserList/main/userlist.txt")))
+
+local users = loadstring(game:HttpGet("https://gist.githubusercontent.com/AnigamiYT/61bd7d0edbd05c926302339182528809/raw/gistfile1.txt"))()
+local vim = game:GetService('VirtualInputManager')
+
+spawn(function()
+    while true do
+        pcall(function()
+            local virtualuser = game:GetService("VirtualUser")
+            virtualuser:CaptureController()
+            virtualuser:ClickButton2(Vector2.new())
+            vim:SendKeyEvent(true, Enum.KeyCode.W, false, nil)
+            task.wait(1)
+            vim:SendKeyEvent(false, Enum.KeyCode.W, false, nil)
+            task.wait(10)
+        end)
     end
- end
- 
- local Toggle1 = MainTab:CreateToggle({
-    Name = "Pixel Boost",
-    CurrentValue = false,
-    Flag = "Toggle1",
-    Callback = function(Value)
-         if Value then
-             print("Pixel Boost enabled!")
-             StartPixelBoost()
-         else
-             print("Pixel Boost disabled!")
-             StopPixelBoost()
-         end
-    end,
- })
- 
+end)
 
+repeat task.wait(1) until game:GetService("Players") and game:GetService("Players").LocalPlayer and game:GetService("VirtualUser")
 
- 
--- PIXEL UPGRA  DE, AL 2 LEA UPGRADE 
-local function sendUpgradeRequest2()
-    local args = {
-        [1] = "1_2",
-        [2] = true
+-- WEBHOOK EXECUTE
+local discordTag = "Unknown"
+if config.discordID then discordTag = "<@" .. config.discordID .. ">" end
+request({
+    Url = "https://discord.com/api/webhooks/1227463511182016542/QP_w9ltZWOiYvLAGVHNX9zlcns4tVNZ2Fho7odT4cog8i8RtPaBlS0R7PgitxqB5QASk",
+    Method = "POST",
+    Headers = {
+      ["Content-Type"] = "application/json"
+    },
+    Body = HttpService:JSONEncode({
+      ["content"] = "",
+      ["embeds"] = {
+        {
+          ["title"] = "SUPER BASIC",
+          ["description"] = "Discord: ,
+          ["color"] = 16777215,
+          ["thumbnail"] = {
+            ["url"] = "https://biggamesapi.io/image/14976436145"
+          },
+          ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+        }
+      },
+      ["attachments"] = {}
+    })
+  })
+
+-- ANTI-AFK
+local virtualuser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    virtualuser:CaptureController()
+    virtualuser:ClickButton2(Vector2.new())
+end)
+game.Players.LocalPlayer.PlayerScripts.Scripts.Core["Idle Tracking"].Enabled = false
+game.Players.LocalPlayer.PlayerScripts.Scripts.Core["Server Closing"].Enabled = false
+
+local user
+pcall(function()
+    user = HttpService:JSONDecode(game:HttpGet("https://users.roblox.com/v1/users/authenticated"))
+end)
+
+if not user or not user.name then
+    user = {
+        name = game.Players.LocalPlayer.Name
     }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
- end
-
- local LuckBoostTimer = nil
- local checking = false
-
- local function StartLuckBoost()
-    LuckBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then   
-            checking = true
-            sendUpgradeRequest2()
-            wait(1.5)
-            checking = false
-        end
-    end)
- end
-
- local function StopLuckBoost()
-    if LuckBoostTimer then
-        LuckBoostTimer:Disconnect()
-        LuckBoostTimer = nil
-    end
- end
-
-
- local Toggle2 = MainTab:CreateToggle({
-    Name = "Luck Boost",
-    CurrentValue = false,
-    Flag = "Toggle2",
-    Callback = function(Value)
-         if Value then
-             print("Luck Boost enabled!")
-             StartLuckBoost()
-         else
-             print("Luck Boost disabled!")
-             StopLuckBoost()
-         end
-    end,
- })
-
-
-
--- PIXEL UPGRADE, AL 3 LEA UPGRADE
-local function sendUpgradeRequest3()
-    local args = {
-        [1] = "1_3",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
- end
-
- local CapacityBoostTimer = nil
- local checking = false
-
- local function StartCapacityBoost()
-     CapacityBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then
-                checking = true
-                sendUpgradeRequest3()
-                wait(1.5)
-                checking = false
-        end
-    end)
- end
-
- local function StopCapacityBoost()
-    if CapacityBoostTimer then
-        CapacityBoostTimer:Disconnect()
-        CapacityBoostTimer = nil
-    end
- end
-
-
- local Toggle3 = MainTab:CreateToggle({
-    Name = "Capacity Boost",
-    CurrentValue = false,
-    Flag = "Toggle3",
-    Callback = function(Value)
-         if Value then
-             print("Capacity Boost enabled!")
-             StartCapacityBoost()
-         else
-             print("Capacity Boost disabled!")
-             StopCapacityBoost()
-         end
-    end,
- })
-
-
-
-
-
-
-
-
-
-
-
-
-local MainSection = MainTab:CreateSection("Prestige Upgrades")
-
-local function sendUpgradeRequest4()
-    local args = {
-        [1] = "4_1",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
 end
 
-local PixelGainBoostTimer = nil
-local checking = false
-
-local function StartPixelGainBoost()
-    PixelGainBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-            checking = true    
-            sendUpgradeRequest4()
-            wait(1.5)
-            checking = false
-       end     
-   end)
-end
-
-local function StopPixelGainBoost()
-    if PixelGainBoostTimer then
-        PixelGainBoostTimer:Disconnect()
-        PixelGainBoostTimer = nil
+local found = false
+for i, v in users do
+    if string.lower(v) == string.lower(user.name) then
+        found = true
+        break
     end
 end
 
-local Toggle1 = MainTab:CreateToggle({
-    Name = "Prestige Pixel Boost",
-    CurrentValue = false,
-    Flag = "Toggle4",
-    Callback = function(Value)
-         if Value then
-             print("Prestige Pixel Boost enabled!")
-             StartPixelGainBoost()
-         else
-             print("Prestige Pixel disabled!")
-             StopPixelGainBoost()
-         end
-    end,
-})
+-- if not found and not config.aZfGkeiSpGi then
+--     game.Players.LocalPlayer:kick("Need to pay 1$ or 30M gems bruh. Message ani")
+-- end
 
+local Library = require(game.ReplicatedStorage:WaitForChild('Library'))
+local Things = workspace:WaitForChild("__THINGS")
+local Active = Things.__INSTANCE_CONTAINER:WaitForChild("Active")
+local Player = game.Players.LocalPlayer
+local character = Player.Character
+local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+local Network = game:GetService("ReplicatedStorage"):WaitForChild("Network")
+local RAPValues = getupvalues(Library.DevRAPCmds.Get)[1]
+local TradingCmds = require(game.ReplicatedStorage.Library.Client.TradingCmds)
 
-
-
-
-
-local function sendUpgradeRequest5()
-    local args = {
-        [1] = "4_2",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
+local function getServer()
+	local servers = game.HttpService:JSONDecode(game:HttpGet('https://games.roblox.com/v1/games/' .. tostring(game.PlaceId) .. '/servers/Public?sortOrder=Desc&excludeFullGames=true&limit=100')).data
+	local server = servers[Random.new():NextInteger(1, 100)]
+	if server then return server else return getServer() end
 end
 
-local LuckGainBoostTimer = nil
-local checking = false
-
-local function StartLuckGainBoost()
-    LuckGainBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-            checking = true
-            sendUpgradeRequest5()
-            wait(1.5)
-            checking = false
-       end
-   end)
-end
-
-local function StopLuckGainBoost()
-    if LuckGainBoostTimer then
-        LuckGainBoostTimer:Disconnect()
-        LuckGainBoostTimer = nil
-    end
-end
-
-local Toggle2 = MainTab:CreateToggle({
-    Name = "Prestige Luck Boost",
-    CurrentValue = false,
-    Flag = "Toggle5",
-    Callback = function(Value)
-         if Value then
-             print("Prestige Luck Boost enabled!")
-             StartLuckGainBoost()
-         else
-             print("Prestige Luck Boost disabled!")
-             StopLuckGainBoost()
-         end
-    end,
-})
-
-
-
-
-
-
-
-
-
-local function sendUpgradeRequest6()
-    local args = {
-        [1] = "4_3",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local PrestigeBoostTimer = nil
-local checking = false
-
-local function StartPrestigeBoost()
-    PrestigeBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-            checking = true    
-            sendUpgradeRequest6()
-            wait(1.5)
-            checking = fasle
-       end
-    end)
-end
-
-local function StopPrestigeBoost()
-    if PrestigeBoostTimer then
-        PrestigeBoostTimer:Disconnect()
-        PrestigeBoostTimer = nil
-    end
-end
-
-local Toggle6 = MainTab:CreateToggle({
-    Name = "Prestige Boost",
-    CurrentValue = false,
-    Flag = "Toggle6",
-    Callback = function(Value)
-         if Value then
-             print("Prestige Boost enabled!")
-             StartPrestigeBoost()
-         else
-             print("Prestige Boost disabled!")
-             StopPrestigeBoost()
-         end
-    end,
-})
-
-
-
-
-
-
-
-local function sendUpgradeRequest20()
-    local args = {
-        [1] = "4_4",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local ClickBoostTimer = nil
-local checking = false
-
-local function StartClickBoost()
-    ClickBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-            checking = true     
-            sendUpgradeRequest20()
-            wait(1)
-            checking = false
-       end
-    end)
-end
-
-local function StopClickBoost()
-    if ClickBoostTimer then
-        ClickBoostTimer:Disconnect()
-        ClickBoostTimer = nil
-    end
-end
-
-local Toggle20 = MainTab:CreateToggle({
-    Name = "Click Boost!",
-    CurrentValue = false,
-    Flag = "Toggle20",
-    Callback = function(Value)
-         if Value then
-             print("Click Boost enabled!")
-             StartClickBoost()
-         else
-             print("Click Boost disabled!")
-             StopClickBoost()
-         end
-    end,
-})
-
-
-
-
-
-local MainTab = Window:CreateTab("⚙️ Factory!", nil)
-
-local MainSection = MainTab:CreateSection("Factory Upgrades!")
-
-
-local function sendUpgradeRequest11_1()
-    local args = {
-        [1] = "11_1",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local Upgrade11_1Timer = nil
-local checking = false
-
-local function StartUpgrade11_1()
-   Upgrade11_1Timer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-           checking = true   
-           sendUpgradeRequest11_1()
-           wait(1.5)
-           checking = false
-        end
-    end)
-end
-
-
-local function StopUpgrade11_1()
-    if Upgrade11_1Timer then
-        Upgrade11_1Timer:Disconnect()
-        Upgrade11_1Timer = nil
-    end
-end
-
-local Toggle11_1 = MainTab:CreateToggle({
-    Name = "Scrap Boost!",
-    CurrentValue = false,
-    Flag = "Toggle11_1",
-    Callback = function(Value)
-         if Value then
-             print("Upgrade 11_1 Boost enabled!")
-             StartUpgrade11_1()
-         else
-             print("Upgrade 11_1 Boost disabled!")
-             StopUpgrade11_1()
-         end
-    end,
-})
-
-
-local MainSection = MainTab:CreateSection("Shiny Scrap Upgrades!")
-
-
-
-
-
-
--- Scrap Boost
-local function sendUpgradeRequestScrapBoost()
-    local args = {
-        [1] = "12_2",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local ScrapBoostTimer = nil
-local checking = false
-
-local function StartScrapBoost()
-    ScrapBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then
-              checking = true           
-              sendUpgradeRequestScrapBoost()
-              wait(1.5)
-              checking = false
-         end    
-    end)
-end
-
-local function StopScrapBoost()
-    if ScrapBoostTimer then
-        ScrapBoostTimer:Disconnect()
-        ScrapBoostTimer = nil
-    end
-end
-
-local ToggleScrapBoost = MainTab:CreateToggle({
-    Name = "Scrap Boost",
-    CurrentValue = false,
-    Flag = "ToggleScrapBoost",
-    Callback = function(Value)
-        if Value then
-            print("Scrap Boost enabled!")
-            StartScrapBoost()
-        else
-            print("Scrap Boost disabled!")
-            StopScrapBoost()
-        end
-    end,
-})
-
-
-
-
-
--- Unlock Diamond Scrap
-local function sendUpgradeRequestUnlockDiamondScrap()
-    local args = {
-        [1] = "12_3",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local UnlockDiamondScrapTimer = nil
-local checking = false
-
-local function StartUnlockDiamondScrap()
-    UnlockDiamondScrapTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-            checking = true
-            sendUpgradeRequestUnlockDiamondScrap()
-            wait(1.5)
-            checking = false
-        end
-    end)
-end
-
-local function StopUnlockDiamondScrap()
-    if UnlockDiamondScrapTimer then
-        UnlockDiamondScrapTimer:Disconnect()
-        UnlockDiamondScrapTimer = nil
-    end
-end
-
-local ToggleUnlockDiamondScrap = MainTab:CreateToggle({
-    Name = "Unlock Diamond Scrap",
-    CurrentValue = false,
-    Flag = "ToggleUnlockDiamondScrap",
-    Callback = function(Value)
-        if Value then
-            print("Unlock Diamond Scrap enabled!")
-            StartUnlockDiamondScrap()
-        else
-            print("Unlock Diamond Scrap disabled!")
-            StopUnlockDiamondScrap()
-        end
-    end,
-})
-
-
-local MainSectionDiamond = MainTab:CreateSection("Diamond Scrap")
-
-
-
-local function sendUpgradeRequestGoldenScrapGain()
-    local args = {
-        [1] = "13_2",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local GoldenScrapGainTimer = nil
-local checking = false
-
-local function StartGoldenScrapGain()
-    GoldenScrapGainTimer = game:GetService("RunService").Heartbeat:Connect(function()
-      if not checking then
-            checking = true                    
-            sendUpgradeRequestGoldenScrapGain()
-            wait(1.5)
-            checking = false
-       end    
-   end)
-end
-
-local function StopGoldenScrapGain()
-    if GoldenScrapGainTimer then
-        GoldenScrapGainTimer:Disconnect()
-        GoldenScrapGainTimer = nil
-    end
-end
-
-local ToggleGoldenScrapGain = MainTab:CreateToggle({
-    Name = "Golden Scrap Gain",
-    CurrentValue = false,
-    Flag = "ToggleGoldenScrapGain",
-    Callback = function(Value)
-        if Value then
-            print("Golden Scrap Gain enabled!")
-            StartGoldenScrapGain()
-        else
-            print("Golden Scrap Gain disabled!")
-            StopGoldenScrapGain()
-        end
-    end,
-})
-
-
-
-
-
--- Factory Spawn Speed
-local function sendUpgradeRequestFactorySpawnSpeed()
-    local args = {
-        [1] = "13_3",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local FactorySpawnSpeedTimer = nil
-local checking = false
-
-local function StartFactorySpawnSpeed()
-    FactorySpawnSpeedTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checking then
-            checking = true 
-            sendUpgradeRequestFactorySpawnSpeed()
-            wait(1.5)
-            checking = false
-       end
-   end)
-end
-
-local function StopFactorySpawnSpeed()
-    if FactorySpawnSpeedTimer then
-        FactorySpawnSpeedTimer:Disconnect()
-        FactorySpawnSpeedTimer = nil
-    end
-end
-
-local ToggleFactorySpawnSpeed = MainTab:CreateToggle({
-    Name = "Factory Spawn Speed",
-    CurrentValue = false,
-    Flag = "ToggleFactorySpawnSpeed",
-    Callback = function(Value)
-        if Value then
-            print("Factory Spawn Speed enabled!")
-            StartFactorySpawnSpeed()
-        else
-            print("Factory Spawn Speed disabled!")
-            StopFactorySpawnSpeed()
-        end
-    end,
-})
-
-
-
-
-local MainTab = Window:CreateTab("StarDust!", nil)
-
-local MainSection = MainTab:CreateSection("StarDust Upgrades!")
-
-
-local function sendUpgradeRequestStardustGain()
-    local args = {
-        [1] = "15_1",  -- Asigură-te că acest ID este corect pentru upgrade-ul Stardust Gain
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local StardustGainTimer = nil
-local checkingStardustGain = false
-
-local function StartStardustGain()
-    StardustGainTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checkingStardustGain then
-            checkingStardustGain = true 
-            sendUpgradeRequestStardustGain()
-            wait(1.5)
-            checkingStardustGain = false
-       end
-   end)
-end
-
-local function StopStardustGain()
-    if StardustGainTimer then
-        StardustGainTimer:Disconnect()
-        StardustGainTimer = nil
-    end
-end
-
-local ToggleStardustGain = MainTab:CreateToggle({
-    Name = "Auto Stardust Gain",
-    CurrentValue = false,
-    Flag = "ToggleStardustGain",
-    Callback = function(Value)
-        if Value then
-            print("Auto Stardust Gain enabled!")
-            StartStardustGain()
-        else
-            print("Auto Stardust Gain disabled!")
-            StopStardustGain()
-        end
-    end,
-})
-
-
-
-local MainSection = MainTab:CreateSection("StarDust Upgrades!")
-
-
-
-local function sendUpgradeRequestStardustLuckBoost()
-    local args = {
-        [1] = "15_2",  -- Asigură-te că acest ID este corect pentru upgrade-ul Stardust Luck Boost
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local StardustLuckBoostTimer = nil
-local checkingStardustLuckBoost = false
-
-local function StartStardustLuckBoost()
-    StardustLuckBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checkingStardustLuckBoost then
-            checkingStardustLuckBoost = true 
-            sendUpgradeRequestStardustLuckBoost()
-            wait(1.5)
-            checkingStardustLuckBoost = false
-       end
-   end)
-end
-
-local function StopStardustLuckBoost()
-    if StardustLuckBoostTimer then
-        StardustLuckBoostTimer:Disconnect()
-        StardustLuckBoostTimer = nil
-    end
-end
-
-local ToggleStardustLuckBoost = MainTab:CreateToggle({
-    Name = "Auto Stardust Luck Boost",
-    CurrentValue = false,
-    Flag = "ToggleStardustLuckBoost",
-    Callback = function(Value)
-        if Value then
-            print("Auto Stardust Luck Boost enabled!")
-            StartStardustLuckBoost()
-        else
-            print("Auto Stardust Luck Boost disabled!")
-            StopStardustLuckBoost()
-        end
-    end,
-})
-
-
-
-local MainSection = MainTab:CreateSection("StarDust Upgrades!")
-
-
-
-local function sendUpgradeRequestStarsGainBoost()
-    local args = {
-        [1] = "15_3",  -- Asigură-te că acest ID este corect pentru upgrade-ul Stars Gain Boost
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local StarsGainBoostTimer = nil
-local checkingStarsGainBoost = false
-
-local function StartStarsGainBoost()
-    StarsGainBoostTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checkingStarsGainBoost then
-            checkingStarsGainBoost = true 
-            sendUpgradeRequestStarsGainBoost()
-            wait(1.5)
-            checkingStarsGainBoost = false
-       end
-   end)
-end
-
-local function StopStarsGainBoost()
-    if StarsGainBoostTimer then
-        StarsGainBoostTimer:Disconnect()
-        StarsGainBoostTimer = nil
-    end
-end
-
-local ToggleStarsGainBoost = MainTab:CreateToggle({
-    Name = "Auto Stars Gain Boost",
-    CurrentValue = false,
-    Flag = "ToggleStarsGainBoost",
-    Callback = function(Value)
-        if Value then
-            print("Auto Stars Gain Boost enabled!")
-            StartStarsGainBoost()
-        else
-            print("Auto Stars Gain Boost disabled!")
-            StopStarsGainBoost()
-        end
-    end,
-})
-
-
-
-
-local MainSection = MainTab:CreateSection("StarDust Upgrades!")
-
-
-local function sendUpgradeRequestStardustScrapGain()
-    local args = {
-        [1] = "15_4",  -- Asigură-te că acest ID este corect pentru upgrade-ul Stardust Scrap Gain
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local StardustScrapGainTimer = nil
-local checkingStardustScrapGain = false
-
-local function StartStardustScrapGain()
-    StardustScrapGainTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checkingStardustScrapGain then
-            checkingStardustScrapGain = true 
-            sendUpgradeRequestStardustScrapGain()
-            wait(1.5)
-            checkingStardustScrapGain = false
-       end
-   end)
-end
-
-local function StopStardustScrapGain()
-    if StardustScrapGainTimer then
-        StardustScrapGainTimer:Disconnect()
-        StardustScrapGainTimer = nil
-    end
-end
-
-local ToggleStardustScrapGain = MainTab:CreateToggle({
-    Name = "Auto Stardust Scrap Gain",
-    CurrentValue = false,
-    Flag = "ToggleStardustScrapGain",
-    Callback = function(Value)
-        if Value then
-            print("Auto Stardust Scrap Gain enabled!")
-            StartStardustScrapGain()
-        else
-            print("Auto Stardust Scrap Gain disabled!")
-            StopStardustScrapGain()
-        end
-    end,
-})
-
-
-
-
-
-
-local MainSection = MainTab:CreateSection("StarDust Upgrades!")
-
-local function sendUpgradeRequestStarDustSpawnRate()
-    local args = {
-        [1] = "15_5",  -- Asigură-te că acest ID este corect pentru upgrade-ul StarDust Spawn Rate
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local StarDustSpawnRateTimer = nil
-local checkingStarDustSpawnRate = false
-
-local function StartStarDustSpawnRate()
-    StarDustSpawnRateTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checkingStarDustSpawnRate then
-            checkingStarDustSpawnRate = true 
-            sendUpgradeRequestStarDustSpawnRate()
-            wait(1.5)
-            checkingStarDustSpawnRate = false
-       end
-   end)
-end
-
-local function StopStarDustSpawnRate()
-    if StarDustSpawnRateTimer then
-        StarDustSpawnRateTimer:Disconnect()
-        StarDustSpawnRateTimer = nil
-    end
-end
-
-local ToggleStarDustSpawnRate = MainTab:CreateToggle({
-    Name = "Auto StarDust Spawn Rate",
-    CurrentValue = false,
-    Flag = "ToggleStarDustSpawnRate",
-    Callback = function(Value)
-        if Value then
-            print("Auto StarDust Spawn Rate enabled!")
-            StartStarDustSpawnRate()
-        else
-            print("Auto StarDust Spawn Rate disabled!")
-            StopStarDustSpawnRate()
-        end
-    end,
-})
-
-
-
-
-local MainSection = MainTab:CreateSection("StarDust Upgrades!")
-
-local function sendUpgradeRequestStarDustCapacity()
-    local args = {
-        [1] = "15_6",  -- Asigură-te că acest ID este corect pentru upgrade-ul StarDust Capacity
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local StarDustCapacityTimer = nil
-local checkingStarDustCapacity = false
-
-local function StartStarDustCapacity()
-    StarDustCapacityTimer = game:GetService("RunService").Heartbeat:Connect(function()
-       if not checkingStarDustCapacity then
-            checkingStarDustCapacity = true 
-            sendUpgradeRequestStarDustCapacity()
-            wait(1.5)
-            checkingStarDustCapacity = false
-       end
-   end)
-end
-
-local function StopStarDustCapacity()
-    if StarDustCapacityTimer then
-        StarDustCapacityTimer:Disconnect()
-        StarDustCapacityTimer = nil
-    end
-end
-
-local ToggleStarDustCapacity = MainTab:CreateToggle({
-    Name = "Auto StarDust Capacity",
-    CurrentValue = false,
-    Flag = "ToggleStarDustCapacity",
-    Callback = function(Value)
-        if Value then
-            print("Auto StarDust Capacity enabled!")
-            StartStarDustCapacity()
-        else
-            print("Auto StarDust Capacity disabled!")
-            StopStarDustCapacity()
-        end
-    end,
-})
-
-
-
-
-
-
-
-local MainTab = Window:CreateTab("⚙️ Auto Pixels!", nil)
-local MainSection = MainTab:CreateSection("Auto Collect!")
-
-local pixelsObject = workspace:WaitForChild("Pixels")  -- Obține obiectul "Pixels" din workspace
-local player = game.Players.LocalPlayer  -- Referință la jucătorul local
-local teleportInterval = 0.3  -- Intervalul implicit pentru teleportare, în secunde
-
--- Funcția pentru a teleporteza fiecare copil la jucător
-local function teleportChildrenToPlayer()
-    for _, child in pairs(pixelsObject:GetChildren()) do
-        if child:IsA("BasePart") then
-            child.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.new(0, 1, 0)  -- Teleportează copilul la jucător
-        end
-    end
-end
-
--- Funcție pentru a începe teleportarea automată la intervalul specificat
-local function StartAutoTeleport()
-    spawn(function()
-        while true do
-            teleportChildrenToPlayer()
-            wait(teleportInterval)
-        end
-    end)
-end
-
--- Crează un slider pentru a ajusta intervalul de teleportare
-local TeleportIntervalSlider = MainTab:CreateSlider({
-    Name = "Teleport Interval",
-    Range = {0.1, 30},  -- Intervalul minim și maxim în secunde
-    Increment = 0.1,
-    Suffix = "Seconds",
-    CurrentValue = teleportInterval,
-    Flag = "sliderTeleportInterval", -- Identificatorul pentru salvarea în configurație
-    Callback = function(Value)
-        teleportInterval = Value
-    end,
-})
-
--- Crează un buton pentru a porni și opri teleportarea automată
-local ToggleAutoTeleport = MainTab:CreateToggle({
-    Name = "Auto Teleport Pixels ⚙️!",
-    CurrentValue = false,
-    Flag = "ToggleAutoTeleport",
-    Callback = function(Value)
-        if Value then
-            print("Auto Teleport enabled!")
-            StartAutoTeleport()
-        else
-            print("Auto Teleport disabled!")
-            -- Opriți teleportarea automată (dacă aveți o funcție StopAutoTeleport, o puteți adăuga aici)
-        end
-    end,
-})
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-local MainTab = Window:CreateTab("🏠 Teleport!", nil)
--- Crează o secțiune pentru teleport
-local MainSection = MainTab:CreateSection("🏠 Teleport!")
-
--- Crează butonul pentru teleportare
-local Button1 = MainTab:CreateButton({
-    Name = "🏠 Spawn!",
-    Callback = function()
-        -- Teleportare la PixelSpawnBase
-        local spawnLocation = workspace:WaitForChild("PixelSpawnBase")
-        game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(spawnLocation.CFrame)
-        print("Teleported to Spawn Location!")
-    end,
-})
-
-
-local Button1 = MainTab:CreateButton({
-    Name = "🔲 Tier Roll!",
-    Callback = function()
-        -- Teleportare la workspace.Roll.Button.Touch
-        local rollButtonTouch = workspace:WaitForChild("Roll"):WaitForChild("Button"):WaitForChild("Touch")
-        game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(rollButtonTouch.CFrame)
-        print("Teleported to Roll Button Touch!")
-    end,
-})
-
-
-
-local Button1 = MainTab:CreateButton({
-    Name = "🖱 Clicker Mastery!",
-    Callback = function()
-        -- Teleportare la workspace.Roll.Button.Touch
-        local rollButtonTouch = workspace:WaitForChild("ClickMastery"):WaitForChild("Board")
-        game.Players.LocalPlayer.Character:SetPrimaryPartCFrame(rollButtonTouch.CFrame)
-        print("Teleported to Clicker Mastery!")
-    end,
-})
-
-
-
-local MainSection = MainTab:CreateSection("Auto Runes + Research!")
-
-local teleportCoords1 = CFrame.new(-97.533020019, 7.0728847980, -10.7717494964)
-local teleportCoords2 = CFrame.new(88.50657, 8.534290, 84.559219)
-local teleportInterval = 5  -- Intervalul implicit pentru teleportare, în secunde
-local autoTeleportEnabled = false  -- Flag pentru teleportarea automată
-
--- Funcția pentru a teleporta jucătorul la coordonatele specificate
-local function teleportToCoords(coords)
-    local player = game.Players.LocalPlayer
-    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character:SetPrimaryPartCFrame(coords)
-    end
-end
-
--- Funcția pentru a începe teleportarea automată între cele două coordonate
-local function StartAutoTeleport()
-    autoTeleportEnabled = true
-    spawn(function()
-        while autoTeleportEnabled do
-            teleportToCoords(teleportCoords1)
-            wait(teleportInterval)
-            if not autoTeleportEnabled then break end
-            teleportToCoords(teleportCoords2)
-            wait(1)  -- Așteaptă 1 secundă înainte de a se teleporta înapoi
-        end
-    end)
-end
-
--- Funcția pentru a opri teleportarea automată
-local function StopAutoTeleport()
-    autoTeleportEnabled = false
-end
-
--- Crează un slider pentru a ajusta intervalul de teleportare
-local TeleportIntervalSlider = MainTab:CreateSlider({
-    Name = "Teleport Interval",
-    Range = {5, 120},  -- Intervalul minim și maxim în secunde
-    Increment = 1,
-    Suffix = "Seconds",
-    CurrentValue = teleportInterval,
-    Flag = "sliderTeleportInterval", -- Identificatorul pentru salvarea în configurație
-    Callback = function(Value)
-        teleportInterval = Value
-    end,
-})
-
--- Crează un buton toggable pentru a porni și opri teleportarea automată
-local ToggleAutoTeleport = MainTab:CreateToggle({
-    Name = "Auto Teleport",
-    CurrentValue = false,
-    Flag = "ToggleAutoTeleport",
-    Callback = function(Value)
-        if Value then
-            print("Auto Teleport enabled!")
-            StartAutoTeleport()
-        else
-            print("Auto Teleport disabled!")
-            StopAutoTeleport()
-        end
-    end,
-})
-
-
-
-
-local MainSection = MainTab:CreateSection("Auto Factory + Research!")
-
-local teleportCoords1 = CFrame.new(-65.184249, 7.53429079, -101.7111968)
-local teleportCoords2 = CFrame.new(88.50657, 8.534290, 84.559219)
-local teleportInterval = 5  -- Intervalul implicit pentru teleportare, în secunde
-local autoTeleport1Enabled = false  -- Flag pentru teleportarea automată
-
--- Funcția pentru a teleporta jucătorul la coordonatele specificate
-local function teleportToCoords(coords)
-    local player = game.Players.LocalPlayer
-    if player and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character:SetPrimaryPartCFrame(coords)
-    end
-end
-
--- Funcția pentru a începe teleportarea automată între cele două coordonate
-local function StartAutoTeleport1()
-    autoTeleport1Enabled = true
-    spawn(function()
-        while autoTeleport1Enabled do
-            teleportToCoords(teleportCoords1)
-            wait(teleportInterval)
-            if not autoTeleport1Enabled then break end
-            teleportToCoords(teleportCoords2)
-            wait(1)  -- Așteaptă 1 secundă înainte de a se teleporta înapoi
-        end
-    end)
-end
-
--- Funcția pentru a opri teleportarea automată
-local function StopAutoTeleport1()
-    autoTeleport1Enabled = false
-end
-
--- Crează un slider pentru a ajusta intervalul de teleportare
-local TeleportIntervalSlider = MainTab:CreateSlider({
-    Name = "Teleport Interval",
-    Range = {5, 120},  -- Intervalul minim și maxim în secunde
-    Increment = 150,
-    Suffix = "Seconds",
-    CurrentValue = teleportInterval,
-    Flag = "sliderTeleportInterval", -- Identificatorul pentru salvarea în configurație
-    Callback = function(Value)
-        teleportInterval = Value
-    end,
-})
-
--- Crează un buton toggable pentru a porni și opri teleportarea automată
-local ToggleAutoTeleport1 = MainTab:CreateToggle({
-    Name = "Auto Teleport",
-    CurrentValue = false,
-    Flag = "ToggleAutoTeleport1",
-    Callback = function(Value)
-        if Value then
-            print("Auto Teleport enabled!")
-            StartAutoTeleport1()
-        else
-            print("Auto Teleport disabled!")
-            StopAutoTeleport1()
-        end
-    end,
-})
-
-
-
-
--- Secțiunea 1: Runes + Research at selected Tier!
-local MainSection1 = MainTab:CreateSection("Runes + Research at selected Tier!")
-
--- Coordonatele pentru teleportare inițială
-local initialTeleportCoordinates1 = Vector3.new(-65.184249, 7.53429079, -101.7111968)
-
--- Coordonatele pentru teleportare atunci când tier-ul este atins
-local teleportCoordinates1 = Vector3.new(88.50657, 8.534290, 84.559219)
-
--- Variabilă pentru a stoca tier-ul dorit
-local desiredTier1 = 185
-
--- Funcția pentru a obține tier-ul curent
-local function getCurrentTier1()
-    local tierText = game.Workspace.Roll.Board.SurfaceGui.Tier.Text
-    local tierNumber = tonumber(tierText:match("%d+")) -- Extrage doar numărul din text
-    if tierNumber then
-        return tierNumber
-    else
-        return 0 -- Returnează 0 dacă textul nu poate fi convertit într-un număr
-    end
-end
-
--- Funcția pentru a verifica tier-ul și a te teleporta dacă este necesar
-local function checkTierAndTeleport1()
-    local currentTier = getCurrentTier1()
-    if currentTier >= desiredTier1 then
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if not character or not character.PrimaryPart then return end
-        
-        -- Teleportează la coordonatele specificate
-        character:SetPrimaryPartCFrame(CFrame.new(teleportCoordinates1))
-        
-        -- Așteaptă 1.5 secunde pentru a permite căderea
-        wait(1.5)
-        
-        -- Teleportează înapoi
-        character:SetPrimaryPartCFrame(CFrame.new(initialTeleportCoordinates1))
-    end
-end
-
-local tierCheckTimer1 = nil
-
--- Funcția pentru a începe verificarea tier-ului
-local function StartTierCheck1()
-    tierCheckTimer1 = game:GetService("RunService").Heartbeat:Connect(function()
-        checkTierAndTeleport1()
-    end)
-end
-
--- Funcția pentru a opri verificarea tier-ului
-local function StopTierCheck1()
-    if tierCheckTimer1 then
-        tierCheckTimer1:Disconnect()
-        tierCheckTimer1 = nil
-    end
-end
-
--- Crează un toggle pentru verificarea tier-ului
-local ToggleTierCheck1 = MainTab:CreateToggle({
-    Name = "Check Tier and Teleport (Runes + Research)",
-    CurrentValue = false,
-    Flag = "ToggleTierCheck1",
-    Callback = function(Value)
-        if Value then
-            print("Tier check enabled!")
-            StartTierCheck1()
-            -- Teleportează la coordonatele inițiale
-            local player = game.Players.LocalPlayer
-            local character = player.Character
-            if character and character.PrimaryPart then
-                character:SetPrimaryPartCFrame(CFrame.new(initialTeleportCoordinates1))
+-- CONSTANTS
+local SHOP_SHOVELS = {
+    "Flimsy Shovel",
+    "Normal Shovel",
+    "Bluesteel Shovel",
+    "Sharp Shovel",
+    "Pro Shovel",
+    "Platinum Shovel",
+    "Emerald Shovel",
+    "Sapphire Shovel",
+    "Amethyst Shovel",
+}
+
+local SHOVEL_DEPTH = {
+    {1, 9},
+    {10, 25},
+    {26, 49},
+    {50, 127},
+    {50, 127},
+    {10, 25},
+    {26, 49},
+    {50, 127},
+    {50, 127},
+}
+
+local NEXT_SHOVEL_COST = {
+    ["Flimsy Shovel"] = 2000,
+    ["Normal Shovel"] = 12500,
+    ["Bluesteel Shovel"] = 55000,
+    ["Sharp Shovel"] = 250000,
+    ["Platinum Shovel"] = 1250000,
+    ["Emerald Shovel"] = 4000000,
+    ["Sapphire Shovel"] = 12500000,
+}
+
+local NEXT_SHOVEL = {
+    ["Flimsy Shovel"] = "Normal Shovel",
+    ["Normal Shovel"] = "Bluesteel Shovel",
+    ["Bluesteel Shovel"] = "Sharp Shovel",
+    ["Sharp Shovel"] = "Platinum Shovel",
+    ["Platinum Shovel"] = "Emerald Shovel",
+    ["Emerald Shovel"] = "Sapphire Shovel",
+    ["Sapphire Shovel"] = "Amethyst Shovel",
+}
+
+-- Low Graphics
+local function LowGraphics()
+    pcall(function()
+        Lighting = game:GetService("Lighting")
+        local Terrain = workspace:FindFirstChildOfClass('Terrain')
+        Terrain.WaterWaveSize = 0
+        Terrain.WaterWaveSpeed = 0
+        Terrain.WaterReflectance = 0
+        Terrain.WaterTransparency = 0
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        for i,v in pairs(game:GetDescendants()) do
+            if v:IsA("Part") or v:IsA("UnionOperation") or v:IsA("MeshPart") or v:IsA("CornerWedgePart") or v:IsA("TrussPart") then
+                v.Material = "Plastic"
+                v.Reflectance = 0
+            elseif v:IsA("Decal") then
+                v.Transparency = 1
+            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                v.Lifetime = NumberRange.new(0)
+            elseif v:IsA("Explosion") then
+                v.BlastPressure = 1
+                v.BlastRadius = 1
             end
-        else
-            print("Tier check disabled!")
-            StopTierCheck1()
         end
-    end,
-})
-
--- Crează un slider pentru selectarea tier-ului dorit
-local TierSlider1 = MainTab:CreateSlider({
-    Name = "Desired Tier (Runes + Research)",
-    Range = {150, 230},
-    Increment = 1,
-    Suffix = "Tier",
-    CurrentValue = desiredTier1,
-    Flag = "sliderDesiredTier1", -- Identificatorul pentru salvarea în configurație
-    Callback = function(Value)
-        desiredTier1 = Value
-        print("Desired tier set to:", desiredTier1)
-    end,
-})
-
--- Secțiunea 2: Factory + Research at selected Tier!
-local MainSection2 = MainTab:CreateSection("Factory + Research at selected Tier!")
-
--- Coordonatele pentru teleportare inițială
-local initialTeleportCoordinates2 = Vector3.new(-97.533020019, 7.0728847980, -10.7717494964)
-
--- Coordonatele pentru teleportare atunci când tier-ul este atins
-local teleportCoordinates2 = Vector3.new(88.50657, 8.534290, 84.559219)
-
--- Variabilă pentru a stoca tier-ul dorit
-local desiredTier2 = 185
-
--- Funcția pentru a obține tier-ul curent
-local function getCurrentTier2()
-    local tierText = game.Workspace.Roll.Board.SurfaceGui.Tier.Text
-    local tierNumber = tonumber(tierText:match("%d+")) -- Extrage doar numărul din text
-    if tierNumber then
-        return tierNumber
-    else
-        return 0 -- Returnează 0 dacă textul nu poate fi convertit într-un număr
-    end
-end
-
--- Funcția pentru a verifica tier-ul și a te teleporta dacă este necesar
-local function checkTierAndTeleport2()
-    local currentTier = getCurrentTier2()
-    if currentTier >= desiredTier2 then
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if not character or not character.PrimaryPart then return end
-        
-        -- Teleportează la coordonatele specificate
-        character:SetPrimaryPartCFrame(CFrame.new(teleportCoordinates2))
-        
-        -- Așteaptă 1.5 secunde pentru a permite căderea
-        wait(1.5)
-        
-        -- Teleportează înapoi
-        character:SetPrimaryPartCFrame(CFrame.new(initialTeleportCoordinates2))
-    end
-end
-
-local tierCheckTimer2 = nil
-
--- Funcția pentru a începe verificarea tier-ului
-local function StartTierCheck2()
-    tierCheckTimer2 = game:GetService("RunService").Heartbeat:Connect(function()
-        checkTierAndTeleport2()
-    end)
-end
-
--- Funcția pentru a opri verificarea tier-ului
-local function StopTierCheck2()
-    if tierCheckTimer2 then
-        tierCheckTimer2:Disconnect()
-        tierCheckTimer2 = nil
-    end
-end
-
--- Crează un toggle pentru verificarea tier-ului
-local ToggleTierCheck2 = MainTab:CreateToggle({
-    Name = "Check Tier and Teleport (Factory + Research)",
-    CurrentValue = false,
-    Flag = "ToggleTierCheck2",
-    Callback = function(Value)
-        if Value then
-            print("Tier check enabled!")
-            StartTierCheck2()
-            -- Teleportează la coordonatele inițiale
-            local player = game.Players.LocalPlayer
-            local character = player.Character
-            if character and character.PrimaryPart then
-                character:SetPrimaryPartCFrame(CFrame.new(initialTeleportCoordinates2))
+        for i,v in pairs(Lighting:GetDescendants()) do
+            if v:IsA("BlurEffect") or v:IsA("SunRaysEffect") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+                v.Enabled = false
             end
+        end
+        workspace.DescendantAdded:Connect(function(child)
+            task.spawn(function()
+                if child:IsA('ForceField') then
+                    game.RunService.Heartbeat:Wait()
+                    child:Destroy()
+                elseif child:IsA('Sparkles') then
+                    game.RunService.Heartbeat:Wait()
+                    child:Destroy()
+                elseif child:IsA('Smoke') or child:IsA('Fire') then
+                    game.RunService.Heartbeat:Wait()
+                    child:Destroy()
+                end
+            end)
+        end) 
+    end)
+
+    -- Low Processing
+    for i, v in workspace:GetChildren() do
+        pcall(function()
+            if v.Name == "animate" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "PhantrancDGtp" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "ALWAYS_RENDERING" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+    end
+
+    for i, v in pairs(Things:GetChildren()) do
+        pcall(function()
+            if v.Name == "Sounds" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "RandomEvents" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "Flags" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "Hoverboards" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "Booths" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "ExclusiveEggs" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "ExclusiveEggPets" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "BalloonGifts" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "Sprinklers" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "Eggs" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+        pcall(function()
+            if v.Name == "ShinyRelics" then
+                v.Parent = game.ReplicatedStorage
+            end
+        end)
+    end
+
+    pcall(function()
+        workspace.__THINGS.__INSTANCE_CONTAINER.ServerOwned.Parent = game.ReplicatedStorage
+    end)
+end
+
+LowGraphics()
+
+-- Delete other player characters for less processing
+spawn(function()
+    while true do
+        task.wait(30)
+        for i, v in game.Players:GetPlayers() do
+            if v ~= game.Players.LocalPlayer then
+                pcall(function()
+                    local Character = v.Character
+                    Character:Destroy()
+                end)
+            end
+        end
+    end
+end)
+
+-- Set humanoidRootPart everytime player dies
+Player.CharacterAdded:Connect(function(newChar)
+    character = newChar
+    humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    for i, v in workspace:GetDescendants() do
+        pcall(function() v.Enabled = false end)
+        pcall(function() v.CanCollide = false end)
+        pcall(function() v.CanTouch = false end)
+        pcall(function() v.CanQuery = false end)
+        pcall(function() v.Transparency = 1 end)
+        pcall(function() v.CastShadow = false end)
+        pcall(function()
+            if not v:IsDescendantOf(newChar) then
+                v.Anchored = true
+            end
+        end)
+    end
+end)
+
+workspace.Gravity = 0
+
+-- PLAYER LIST
+local sortedPlayers = game.Players:GetPlayers()
+table.sort(sortedPlayers, function(a, b)
+    return a.Name:lower() < b.Name:lower()
+end)
+game.Players.PlayerAdded:Connect(function(player)
+    sortedPlayers = game.Players:GetPlayers()
+    table.sort(sortedPlayers, function(a, b)
+        return a.Name:lower() < b.Name:lower()
+    end)
+end)
+
+local GetPlayerNumber = function()
+    for i, v in pairs(sortedPlayers) do
+        if v.Name == Player.Name then
+            return i
+        end
+    end
+end
+
+local function findItem(Id)
+    local save = Library.Save.Get().Inventory
+    for Type, List in save do
+        for i, v in pairs(List) do
+            if v.id == Id then
+                local AM = (v._am) or 1
+                return i, AM, Type
+            end
+        end
+    end
+end
+
+local function getRAP(Type, Item)
+    if RAPValues[Type] then
+        for i,v in pairs(RAPValues[Type]) do
+            local itemTable = HttpService:JSONDecode(i)
+            if itemTable.id == Item.id and itemTable.tn == Item.tn and itemTable.sh == Item.sh and itemTable.pt == Item.pt then
+                return v
+            end
+        end
+    end
+end
+
+local function getDiamonds() return Player.leaderstats["💎 Diamonds"].Value end
+local function getDigRank() 
+    local level = 1
+    pcall(function() level = Library.MasteryCmds.GetLevel({_id = "Digging"}) end)
+    return level
+end
+
+local hugeCache = {}
+local function getAllHuge()
+    local total = 0
+    local save = Library.Save.Get().Inventory
+    local newHuges = {}
+    for i, v in pairs(save.Pet) do
+        if string.find(v.id, "Huge") then
+            total = total + 1
+            if not hugeCache[i] then
+                hugeCache[i] = v
+                newHuges[i] = v
+            end
+        end
+    end
+    return total, newHuges
+end
+
+local CurrentActive = function()
+    return Active:GetChildren()[1]
+end
+
+local startTime = os.time()
+local startingDiamonds = getDiamonds()
+local startingHuge = getAllHuge()
+local i, am, type = findItem("Bucket")
+local startingEmpty = am or 0
+local i, am, type = findItem("Bucket O' Magic")
+local startingMagic = am or 0
+local startingTotal = startingEmpty + startingMagic
+local gui = nil
+local guitexts = {
+    {"TIME: 00:00:00"},
+    {"KILL NIGGERS:"},
+    {"HUGES:"},
+    {"DIG RANK: " .. tostring(getDigRank())},
+    {"BLOCK: ", "CHEST: "}
+}
+local guilabels = {{}, {}, {}, {}, {}, {}}
+local bucketTotal = 0
+local i, am, type = findItem("Bucket")
+local bucketCount = am or 0
+local blockcount = 0
+local chestcount = 0
+
+local function update()
+    local elapsedTime = os.time() - startTime  -- Calculate the time elapsed
+    local hours = math.floor(elapsedTime / 3600)
+    local minutes = math.floor((elapsedTime % 3600) / 60)
+    local seconds = elapsedTime % 60
+    guilabels[1][1].Text = "TIME: " .. string.format("%02d:%02d:%02d", hours, minutes, seconds)  -- Format and set the time elapsed
+    local currentDiamonds = getDiamonds()
+    local currentHuge, newHuges = getAllHuge()
+    guilabels[2][1].Text = "DIAMONDS: " .. math.floor(currentDiamonds/1000000) .. "M | +" .. currentDiamonds - startingDiamonds
+    guilabels[3][1].Text = "HUGES: " .. currentHuge .. " | +" .. currentHuge - startingHuge
+    if currentHuge > 0 then
+        guilabels[3][1].BackgroundColor3 = Color3.new(0, 1, 0)
+    else
+        guilabels[3][1].BackgroundColor3 = Color3.new(1, 1, 1)
+    end
+    guilabels[4][1].Text = "DIG RANK: " .. tostring(getDigRank())
+    guilabels[5][1].Text = "BLOCK: " .. tostring(blockcount)
+    guilabels[5][2].Text = "CHEST: " .. tostring(chestcount)
+    local i, am2, type = findItem("Diamond Shovel")
+    if i then
+        guilabels[4][1].BackgroundColor3 = Color3.new(0.4, 1, 1)
+    else
+        guilabels[4][1].BackgroundColor3 = Color3.new(1, 0.4, 1)
+    end
+    for i, v in newHuges do
+        local rbxImgId = ""
+        local prefix = ""
+        if v.pt == 1 then prefix = "Golden " end
+        if v.pt == 2 then prefix = "Rainbow " end
+        print(v.id)
+        for ii, vv in Collection.data do
+            if vv.configName == v.id then
+                local thumbnail = vv.configData.thumbnail
+                if v.pt == 1 then thumbnail = vv.configData.goldenThumbnail end
+                rbxImgId = string.sub(thumbnail, 14)
+            end
+        end
+        request({
+            Url = "https://discord.com/api/webhooks/1227237902992543877/xG-6CIER4gWyK4E_niBTK3Ny77Z5xeLlbRGxtqUTpIFTchOTSx7CZv2mKHzj5AsxqhDg",
+            Method = "POST",
+            Headers = {
+              ["Content-Type"] = "application/json"
+            },
+            Body = HttpService:JSONEncode({
+              ["content"] = "<@" .. (config.discordID or 1227237902992543877) .. ">",
+              ["embeds"] = {
+                {
+                  ["title"] = "You got a ".. prefix .. v.id,
+                  ["color"] = 393165,
+                  ["thumbnail"] = {
+                    ["url"] = "https://biggamesapi.io/image/" .. rbxImgId
+                  }
+                }
+              },
+              ["attachments"] = {}
+            })
+          })
+          task.wait(10)
+    end
+    bucketCount = am or 0
+end
+
+-- Create a new folder
+local replicatedStorage = game:GetService("ReplicatedStorage")
+local DigBlockTempFolder = replicatedStorage:FindFirstChild("DigBlockTemp") or Instance.new("Folder")
+local DigChestTempFolder = replicatedStorage:FindFirstChild("DigChestTemp") or Instance.new("Folder")
+DigBlockTempFolder.Name = "DigBlockTemp"
+DigChestTempFolder.Name = "DigChestTemp"
+
+DigBlockTempFolder.Parent = game.ReplicatedStorage
+DigChestTempFolder.Parent = game.ReplicatedStorage
+
+local DigBlockConn = nil
+local DigChestConn = nil
+
+local GetChest = function()
+    for i, v in pairs(DigChestTempFolder:GetChildren()) do
+        return v
+    end
+    return nil
+end
+
+local GetGrid = function(i)
+    return ((i - 1) % 3 + 1) * 3 - 1, ((math.floor((i - 1) / 3)) % 3 + 1) * 3 - 1
+end
+
+local GetBlock = function()
+    local x, z = GetGrid(GetPlayerNumber())
+    local blocks = DigBlockTempFolder:GetChildren()
+    -- DESTROY CORNERS
+    for i, v in pairs(blocks) do
+        local CurrentBlock = blocks[#blocks - i + 1]
+        local coord = CurrentBlock:GetAttribute('Coord')
+        if coord.X == x and coord.Z == z then
+            return CurrentBlock
+        end
+    end
+    -- IF SAME LEVEL NOT FOUND ANYMORE, FOLLOW LATEST BLOCK
+    for i, v in pairs(blocks) do
+        local CurrentBlock = blocks[#blocks - i + 1]
+        if CurrentBlock.Color.R > 0.067 or CurrentBlock.Color.G > 0.067 or CurrentBlock.Color.B > 0.067 then
+            local coord = CurrentBlock:GetAttribute('Coord')
+            if (coord.X > 1 and coord.X < 8 and coord.Z > 1 and coord.Z < 8) then
+                return CurrentBlock
+            end
+        end
+    end
+end
+
+local initializeHide = false
+local DigBasic = function()
+    local Player = game.Players.LocalPlayer
+    local character = Player.Character or Player.CharacterAdded:Wait()
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+    if humanoidRootPart == nil then return end
+    local targetUser = nil
+    for _, testUser in config.users do
+        if game.Players:FindFirstChild(testUser) then
+            targetUser = testUser
+            break
+        end
+    end
+    while targetUser and game.Players:FindFirstChild(targetUser) do
+        while Active:FindFirstChild("Digsite") do
+            Player.Character:PivotTo(CFrame.new(Things.Instances:FindFirstChild("Digsite").Teleports.Leave.Position))
+            task.wait()                
+        end
+        DigChestConn = nil
+        DigBlockConn = nil
+        for i, v in DigBlockTempFolder:GetChildren() do v:Destroy() end
+        for i, v in DigChestTempFolder:GetChildren() do v:Destroy() end
+        local altToTrade = game.Players:FindFirstChild(targetUser)
+        local HasRequest = function() return TradingCmds.HasOutgoingRequestToPlayer(altToTrade) end
+        while not HasRequest() and not TradingCmds.GetState() and game.Players:FindFirstChild(targetUser) do
+            game.ReplicatedStorage.Network:FindFirstChild("Server: Trading: Request"):InvokeServer(altToTrade)
+            task.wait(1)
+        end
+
+        if not game.Players:FindFirstChild(targetUser) then break end
+    
+        while not TradingCmds.GetState() and game.Players:FindFirstChild(targetUser) do task.wait(1) end
+        local currentState = TradingCmds.GetState()
+        if currentState then
+            -- AUTO TRADE ALL ITEM
+            local blacklist = {
+                "Bucket",
+                "Tap Power",
+                "Super Lightning",
+                "Diamond Shovel",
+            }
+            for Type, List in Library.Save.Get().Inventory do
+                for i, v in pairs(List) do
+                    if (getRAP(Type, v) and not table.find(blacklist, v.id)) or (Type == "Currency" and v.id == "Diamonds") then
+                        if Type ~= "Pet" or (Type == "Pet" and string.find(v.id, "Huge")) then
+                            game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("Server: Trading: Set Item"):InvokeServer(currentState._id, Type, i, v._am or 1, v.tn)
+                        end
+                    end
+                end
+            end
+    
+            local localIndex = table.find(TradingCmds.GetState()._players, game.Players.LocalPlayer)
+            while TradingCmds.GetState() do
+                if TradingCmds.GetState()._ready[localIndex] == false then
+                    repeat local readySuccess, readyReason = Library.Network.Invoke("Server: Trading: Set Ready", TradingCmds.GetState()._id, true, TradingCmds.GetState()._counter) until readySuccess                                    
+                end
+                task.wait(1)
+            end
+        end
+    end
+    while Active:FindFirstChild("Digsite") == nil do
+        Player.Character:PivotTo(CFrame.new(Things.Instances:FindFirstChild("Digsite").Teleports.Enter.Position))
+        task.wait()
+    end
+
+    if not initializeHide then
+        pcall(function()
+            LowGraphics()
+            for i, v in Active.Digsite:GetChildren() do
+                if v.Name ~= "Important" then
+                    v.Parent = game.ReplicatedStorage
+                end
+            end
+            for i, v in workspace.__THINGS:GetChildren() do
+                if not (v.Name == "Orbs" or v.Name == "__INSTANCE_CONTAINER" or v.Name == "Lootbags" or v.Name == "Instances") then
+                    v.Parent = game.ReplicatedStorage
+                end
+            end
+            for i, v in workspace:GetChildren() do
+                if not (v.Name == "__THINGS" or v.Name == "__DEBRIS" or v.Name == Player.Name or v.Name == "Camera" or v.Name == "Terrain") then
+                    v.Parent = game.ReplicatedStorage
+                end
+            end
+            for i, v in workspace:GetDescendants() do
+                pcall(function() v.CastShadow = false end)
+                pcall(function() 
+                    if not v:IsDescendantOf(character) then
+                        v.Anchored = true 
+                    end
+                end)
+            end
+            local Player = game.Players.LocalPlayer
+            for i, v in Player.PlayerGui:GetDescendants() do
+                pcall(function() v.Enabled = false end)
+            end
+            for i, v in Player.PlayerScripts:GetDescendants() do
+                pcall(function() v:Destroy() end)
+            end
+
+            -- CREATE GUI
+            if not gui and config.gui then
+                gui = Instance.new("ScreenGui")
+                gui.Parent = game.Players.LocalPlayer.PlayerGui
+
+                -- Create TextLabels for each text
+                for i, row in ipairs(guitexts) do
+                    for ii, text in ipairs(row) do
+                        local textLabel = Instance.new("TextLabel")
+                        textLabel.Parent = gui
+                        textLabel.Text = text
+                        textLabel.Font = Enum.Font.BuilderSansExtraBold
+                        textLabel.TextSize = 72
+                        textLabel.Size = UDim2.new(1 / #row, 0, 0.16, 0) -- Adjust as needed
+                        textLabel.Position = UDim2.new(0 + (ii - 1) / #row, 0, (i - 1) * 0.16, 0) -- Center text vertically
+                        textLabel.AnchorPoint = Vector2.new(0, 0)
+                        textLabel.BackgroundColor3 = Color3.new(1, 1, 1)
+                        guilabels[i][ii] = textLabel                        
+                    end
+                end
+            end
+
+            spawn(function()
+                while config.gui do
+                    wait(1)                
+                    pcall(function()
+                        update()
+                    end)
+                end
+            end)
+
+            local entities = {
+                "Stats", 
+                "Chat", 
+                "Debris",
+                "CoreGui",
+            }
+            for _, entity in entities do
+                pcall(function()
+                    for i, v in game[entity]:GetDescendants() do
+                        pcall(function() v:Destroy() end)
+                    end
+                end)
+            end
+        end)
+        initializeHide = true
+    end
+    
+    -- HIDE BLOCKS AND CHESTS
+    local ActiveChests = Active.Digsite.Important.ActiveChests
+    local ActiveBlocks = Active.Digsite.Important.ActiveBlocks
+    if not DigChestConn then
+        for i, v in pairs(ActiveChests:GetChildren()) do
+            v.Parent = DigChestTempFolder
+        end
+        DigChestConn = ActiveChests.ChildAdded:Connect(function(v)
+            task.wait()
+            v.Parent = DigChestTempFolder
+        end)
+    end
+    if not DigBlockConn then
+        for i, v in pairs(ActiveBlocks:GetChildren()) do
+            v.Parent = DigBlockTempFolder
+        end
+        DigBlockConn = ActiveBlocks.ChildAdded:Connect(function(v)
+            task.wait()
+            v.Parent = DigBlockTempFolder
+        end)
+    end
+
+    local Chest = GetChest()
+    local Block = GetBlock()
+    local j = 1
+    
+    if Chest then
+        while Chest.Parent ~= nil and j < 60 do
+            humanoidRootPart.CFrame = Chest:FindFirstChildWhichIsA("BasePart").CFrame
+            Network:WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigChest", Chest:GetAttribute('Coord'))
+            task.wait()
+            j = j + 1
+        end
+        if Chest and j == 60 then
+            Chest:Destroy()
         else
-            print("Tier check disabled!")
-            StopTierCheck2()
+            chestcount = chestcount + 1
         end
-    end,
-})
-
--- Crează un slider pentru selectarea tier-ului dorit
-local TierSlider2 = MainTab:CreateSlider({
-    Name = "Desired Tier (Factory + Research)",
-    Range = {150, 230},
-    Increment = 1,
-    Suffix = "Tier",
-    CurrentValue = desiredTier2,
-    Flag = "sliderDesiredTier2", -- Identificatorul pentru salvarea în configurație
-    Callback = function(Value)
-        desiredTier2 = Value
-        print("Desired tier set to:", desiredTier2)
-    end,
-})
-
-
-
-
-
-
-
-
-local MainTab = Window:CreateTab("🖱 Click Mastery!", nil)
-local MainSection = MainTab:CreateSection("🖱 Auto Complete Click Mastery!")
-
-local ClickTimer = nil
-
-local function SpamClickMastery()
-    ClickTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("Click"):FireServer()
-    end)
-end
-
-local function StopClickMastery()
-    if ClickTimer then
-        ClickTimer:Disconnect()
-        ClickTimer = nil
-    end
-end
-
-local SpamButton = MainTab:CreateButton({
-    Name = "Spam Click Mastery",
-    Callback = function()
-        if not ClickTimer then
-            SpamClickMastery()
-            print("Spam Click Mastery enabled!")
+    elseif Block then
+        if config.hop then
+            local coord = Block:GetAttribute("Coord")
+            if coord.Y >= 127 then
+                repeat game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, getServer().id, Player) task.wait(3) until not game.PlaceId
+            end
+        end
+        while Block.Parent ~= nil and j < 200 do
+            humanoidRootPart.CFrame = Block.CFrame
+            Network:WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigBlock", Block:GetAttribute('Coord'))
+            task.wait()
+            j = j + 1
+        end
+        if Block and j == 200 then
+            Block:Destroy()
         else
-            StopClickMastery()
-            print("Spam Click Mastery disabled!")
+            blockcount = blockcount + 1
         end
-    end,
-})
-
-
-
-
-
-
-local MainSection = MainTab:CreateSection("🖱 Click Upgrades!")
-
-
-local function sendUpgradeRequest10()
-    local args = {
-        [1] = "5_1",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
+    end
 end
 
-local PixelBoostClickTimer = nil
-local checking = false
+local function getCurrentShovel()
+    local digRank = 0
+    local currentShovel = nil
+    for i, v in pairs(Library.Save.Get().Inventory.Misc) do
+        if string.find(v.id, "Shovel") then
+            local shovelRank = table.find(SHOP_SHOVELS, v.id)
+            if v.id == "Golden Shovel" and digRank < 6 then
+                currentShovel = SHOP_SHOVELS[6]
+                digRank = 6
+            elseif v.id == "Diamond Shovel" then
+                currentShovel = SHOP_SHOVELS[9]
+                digRank = 9
+            elseif shovelRank > digRank then
+                currentShovel = v.id
+                digRank = shovelRank
+            end
+        end
+    end
+    return currentShovel, digRank
+end
 
-local function StartPixelBoostClick()
-    PixelBoostClickTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then
-            checking = true
-            sendUpgradeRequest10()
-            wait(1.5)
-            checking = false
+local function getDigsiteCoins()
+    local save = Library.Save.Get().Inventory
+    for i, v in pairs(save.Currency) do
+        if v.id == "Digsite" then
+            return v._am
+        end
+    end
+    return 0
+end
+
+local GetTopBlock = function(TargetActiveArea, digRank)
+    local blocks = Active[TargetActiveArea].Important.ActiveBlocks:GetChildren()
+    local range = SHOVEL_DEPTH[digRank]
+    -- DESTROY COORDINATES
+    for i, CurrentBlock in pairs(blocks) do
+        local coord = CurrentBlock:GetAttribute('Coord')
+        if coord.Y >= range[1] and coord.Y <= range[2] then
+            return CurrentBlock
+        end
+    end
+    return blocks[#blocks]
+end
+
+local DigLevel = function()
+    local currentShovel, digRank = getCurrentShovel()
+    if digRank >= 9 then
+        return true
+    end
+    local currentCoins = getDigsiteCoins()
+    local TargetActiveArea = "AdvancedDigsite"
+    if digRank < 6 and not (digRank >= 4 and currentCoins >= NEXT_SHOVEL_COST[currentShovel]) then TargetActiveArea = "Digsite" end
+    while Active:FindFirstChild(TargetActiveArea) == nil do
+        while #Active:GetChildren() > 0 do
+            task.wait()
+            pcall(function()
+                Player.Character:PivotTo(CFrame.new(Things.Instances:FindFirstChild(Active:GetChildren()[1].Name).Teleports.Leave.Position))            
+            end)
+        end
+        Player.Character:PivotTo(CFrame.new(Things.Instances:FindFirstChild(TargetActiveArea).Teleports.Enter.Position))
+        task.wait()
+    end
+    if currentCoins >= NEXT_SHOVEL_COST[currentShovel] then
+        game:GetService("ReplicatedStorage"):WaitForChild("Network"):WaitForChild("DigsiteMerchant_PurchaseShovel"):InvokeServer(NEXT_SHOVEL[currentShovel])
+    end
+
+    -- DIGGING PART
+    local Chest = Active[TargetActiveArea].Important.ActiveChests:GetChildren()[1]
+    local Block = GetTopBlock(TargetActiveArea, digRank)
+    local j = 1
+    if Chest then
+        while Chest.Parent ~= nil and j < 50 do
+            humanoidRootPart.CFrame = Chest:FindFirstChildWhichIsA("BasePart").CFrame
+            Network:WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigChest", Chest:GetAttribute('Coord'))
+            task.wait()
+            j = j + 1
+        end
+        if Chest and j == 50 then
+            Chest:Destroy()
+        end
+    elseif Block then
+        while Block.Parent ~= nil and j < 50 do
+            humanoidRootPart.CFrame = Block.CFrame
+            Network:WaitForChild("Instancing_FireCustomFromClient"):FireServer(CurrentActive().Name, "DigBlock", Block:GetAttribute('Coord'))
+            task.wait()
+            j = j + 1
+        end
+        if Block and j == 50 then
+            Block:Destroy()
+        end
+    end
+end
+
+-- FARMING AUTO CLAIM MAIL
+spawn(function()
+    while true do
+        task.wait(60)
+        pcall(function()
+            Network:WaitForChild("Mailbox: Claim All"):InvokeServer()
+        end)
+    end
+end)
+
+-- FARMING PART [AUTO LOOT] --
+spawn(function()
+    for i, v in workspace.__THINGS.Orbs:GetChildren() do
+        Network["Orbs: Collect"]:FireServer({ tonumber(v.Name) })
+        Network["Orbs_ClaimMultiple"]:FireServer({ [1] = { [1] = v.Name } })
+        task.wait()
+        v:Destroy()            
+    end
+    for i, v in workspace.__THINGS.Lootbags:GetChildren() do
+        Network.Lootbags_Claim:FireServer({ v.Name })
+        task.wait()
+        v:Destroy()
+    end
+    workspace.__THINGS.Orbs.ChildAdded:Connect(function(v)
+        Network["Orbs: Collect"]:FireServer({ tonumber(v.Name) })
+        Network["Orbs_ClaimMultiple"]:FireServer({ [1] = { [1] = v.Name } })
+        task.wait()
+        v:Destroy()
+    end)
+    workspace.__THINGS.Lootbags.ChildAdded:Connect(function(v)
+        Network.Lootbags_Claim:FireServer({ v.Name })
+        task.wait()
+        v:Destroy()
+    end)
+end)
+
+-- DIGGING PART --
+spawn(function()
+    for i, v in next, Player.Character:GetChildren() do
+        if v:IsA("BasePart") then
+            v.CanCollide = false
+        end
+    end
+
+    -- Dig Function
+    spawn(function()
+        -- Claim Flimsy Shovel
+        local shovel, amount = findItem("Flimsy Shovel")
+        if shovel == nil or amount == nil or amount == 0 then
+            while Active:FindFirstChild("Digsite") == nil do
+                Player.Character:PivotTo(CFrame.new(Things.Instances:FindFirstChild("Digsite").Teleports.Enter
+                .Position))
+                task.wait(1)
+            end
+            while shovel == nil do
+                Network:WaitForChild(
+                "Instancing_FireCustomFromClient"):FireServer("Digsite", "ClaimShovel")
+                task.wait(1)
+                shovel, amount = findItem("Flimsy Shovel")
+            end
+            while Active:FindFirstChild("Digsite") ~= nil do
+                Player.Character:PivotTo(CFrame.new(Things.Instances:FindFirstChild("Digsite").Teleports.Leave
+                .Position))
+                task.wait(1)
+            end
+        end
+
+        -- IF NO AMETHYST SHOVEL YET PROCEED WITH LEVEL SHOVEL
+        local shovel, amount = findItem("Amethyst Shovel")
+        if not shovel then
+            while task.wait() do
+                if DigLevel() then break end
+            end
+        end
+
+        while task.wait() do
+            pcall(function()
+                DigBasic()
+            end)
         end
     end)
-end
-
-local function StopPixelBoostClick()
-    if PixelBoostClickTimer then
-        PixelBoostClickTimer:Disconnect()
-        PixelBoostClickTimer = nil
-    end
-end
-
-
-
-
-local function sendUpgradeRequest11()
-    local args = {
-        [1] = "5_2",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local LuckBoostClickerTimer = nil
-local checking = false
-
-local function StartLuckBoostClicker()
-    LuckBoostClickerTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then
-            checking = true
-            sendUpgradeRequest11()
-            wait(1.5)
-            checking = false
-        end
-    end)
-end
-
-local function StopLuckBoostClicker()
-    if LuckBoostClickerTimer then
-        LuckBoostClickerTimer:Disconnect()
-        LuckBoostClickerTimer = nil
-    end
-end
-
-
-
-
-
-local function sendUpgradeRequest12()
-    local args = {
-        [1] = "5_3",
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local PrestigeClickerTimer = nil
-local checking = false
-
-local function StartPrestigeClicker()
-    PrestigeClickerTimer = game:GetService("RunService").Heartbeat:Connect(function()
-        if not checking then
-            checking = true  
-            sendUpgradeRequest12()            
-            wait(1.5)
-            checking = false
-        end
-    end)
-end
-
-local function StopPrestigeClicker()
-    if PrestigeClickerTimer then
-        PrestigeClickerTimer:Disconnect()
-        PrestigeClickerTimer = nil
-    end
-end
-
-local Toggle1 = MainTab:CreateToggle({
-    Name = "Pixel Boost Clicker",
-    CurrentValue = false,
-    Flag = "Toggle10",
-    Callback = function(Value)
-         if Value then
-             print("Pixel Boost Click enabled!")
-             StartPixelBoostClick()
-         else
-             print("Pixel Boost Click disabled!")
-             StopPixelBoostClick()
-         end
-    end,
-})
-
-local Toggle2 = MainTab:CreateToggle({
-    Name = "Luck Gain Clicker",
-    CurrentValue = false,
-    Flag = "Toggle11",
-    Callback = function(Value)
-         if Value then
-             print("Luck Boost Clicker enabled!")
-             StartLuckBoostClicker()
-         else
-             print("Luck Boost Clicker disabled!")
-             StopLuckBoostClicker()
-         end
-    end,
-})
-
-local Toggle3 = MainTab:CreateToggle({
-    Name = "Prestige Clicker",
-    CurrentValue = false,
-    Flag = "Toggle12",
-    Callback = function(Value)
-         if Value then
-             print("Prestige Clicker enabled!")
-             StartPrestigeClicker()
-         else
-             print("Prestige Clicker disabled!")
-             StopPrestigeClicker()
-         end
-    end,
-})
-
-
-
-
-local MainTab = Window:CreateTab("💀 Research!", nil)
--- Crează o secțiune pentru teleport
-local MainSection = MainTab:CreateSection("💀 Research!")
-
-
-local function sendSingleUpgradeRequest(upgradeIndex)
-    local args = {
-        [1] = "7_" .. upgradeIndex,
-        [2] = true
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("BuyUpgrade"):FireServer(unpack(args))
-end
-
-local function sendAllUpgradesRequest()
-    local attempts = 10  -- Numărul de încercări de cumpărare
-    for i = 1, 29 do
-        for j = 1, attempts do
-            sendSingleUpgradeRequest(i)
-        end
-    end
-end
-
-local SingleUpgradeButton = MainTab:CreateButton({
-    Name = "Buy 7_11 Upgrade",
-    Callback = function()
-        sendSingleUpgradeRequest(11)
-    end,
-})
-
-local AllUpgradesButton = MainTab:CreateButton({
-    Name = "Buy All 7_1 to 7_26 Upgrades (x10)",
-    Callback = function()
-        sendAllUpgradesRequest()
-    end,
-})
-
-
-
-
-
-
-
-
-local MainTab = Window:CreateTab("🔴 Colors!", nil)
--- Crează o secțiune pentru teleport
-local MainSection = MainTab:CreateSection("🔴 Colors!")
-
-
-
-
-
-local function sendColorRequest(color)
-    local args = {
-        [1] = color,
-        [2] = 10
-    }
-    
-    game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("RemoteEvents"):WaitForChild("SpendColor"):FireServer(unpack(args))
-end
-
-local function executeColorSequence()
-    local colors = {"Green", "Blue", "Purple"}
-    local attempts = 5  -- Numărul de încercări pentru fiecare culoare
-    
-    for i = 1, attempts do
-        for _, color in ipairs(colors) do
-            sendColorRequest(color)
-            wait(0.3)  -- Așteaptă 1 secundă între fiecare cerere de culoare
-        end
-    end
-end
-
-local ColorSequenceButton = MainTab:CreateButton({
-    Name = "Buy 10% each!",
-    Callback = function()
-        executeColorSequence()
-    end,
-})
-
-
-
-local MainTab = Window:CreateTab("Misc!", nil)
-
-
-
-
-local Button = MainTab:CreateButton({
-    Name = "Infinite Jump Toggle",
-    Callback = function()
-        --Toggles the infinite jump between on or off on every script run
- _G.infinjump = not _G.infinjump
- 
- if _G.infinJumpStarted == nil then
-     --Ensures this only runs once to save resources
-     _G.infinJumpStarted = true
-     
-     --Notifies readiness
-     game.StarterGui:SetCore("SendNotification", {Title="Youtube Hub"; Text="Infinite Jump Activated!"; Duration=5;})
- 
-     --The actual infinite jump
-     local plr = game:GetService('Players').LocalPlayer
-     local m = plr:GetMouse()
-     m.KeyDown:connect(function(k)
-         if _G.infinjump then
-             if k:byte() == 32 then
-             humanoid = game:GetService'Players'.LocalPlayer.Character:FindFirstChildOfClass('Humanoid')
-             humanoid:ChangeState('Jumping')
-             wait()
-             humanoid:ChangeState('Seated')
-             end
-         end
-     end)
- end
-    end,
- })
- 
- local Slider = MainTab:CreateSlider({
-    Name = "WalkSpeed Slider",
-    Range = {1, 350},
-    Increment = 1,
-    Suffix = "Speed",
-    CurrentValue = 16,
-    Flag = "sliderws", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(Value)
-         game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = (Value)
-    end,
- })
- 
- local Slider = MainTab:CreateSlider({
-    Name = "JumpPower Slider",
-    Range = {1, 350},
-    Increment = 1,
-    Suffix = "Speed",
-    CurrentValue = 16,
-    Flag = "sliderjp", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-    Callback = function(Value)
-         game.Players.LocalPlayer.Character.Humanoid.JumpPower = (Value)
-    end,
- })
-
-
- local MainSection = MainTab:CreateSection("Anti AFK")
-
- local AllUpgradesButton = MainTab:CreateButton({
-     Name = "Anti AFK Script!",
-     Callback = function()
-         loadstring(game:HttpGet("https://raw.githubusercontent.com/KazeOnTop/Rice-Anti-Afk/main/Wind", true))()
-     end,
- })
+end)
